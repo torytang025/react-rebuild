@@ -1,6 +1,6 @@
 # React-Rebuild
 
-**React-Rebuild** is an open-source project aimed at creating a complete, from-scratch implementation of React. This project aspires to replicate all core functionalities, features, and APIs of the official React library, providing an identical development experience.
+**React-Rebuild** is an open-source project aimed at creating a complete, from-scratch implementation of React 18. This project aspires to replicate all core functionalities, features, and APIs of the official React library, providing an identical development experience.
 
 ## Goals
 

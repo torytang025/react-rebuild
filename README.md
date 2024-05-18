@@ -10,11 +10,10 @@
 
 ## Features
 
-- **Component System**: Support for both class components and functional components, including the full range of lifecycle methods.
-- **Hooks**: Implement all official React Hooks (`useState`, `useEffect`, etc.).
+- **JSX Transformation**: Integration with JSX for a seamless developer experience.
 - **Virtual DOM**: Efficient virtual DOM and reconciliation algorithm.
 - **Reconciliation**: Accurate implementation of React's reconciliation algorithm for efficient UI updates.
-- **JSX Transformation**: Integration with JSX for a seamless developer experience.
+- **Hooks**: Implement all official React Hooks (`useState`, `useEffect`, etc.).
 
 ## Contributing
 

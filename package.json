@@ -7,12 +7,22 @@
 	"author": "",
 	"main": "index.js",
 	"scripts": {
+		"build": "pnpm clean && pnpm -r build && pnpm build:type",
+		"build:type": "rimraf --glob '**/*.tsbuildinfo' && tsc --build",
+		"clean": "rimraf --glob '**/dist'",
 		"lint": "eslint --ext .js,.ts,.jsx,.tsx --fix --quiet ./packages",
 		"prepare": "husky"
+	},
+	"lint-staged": {
+		"*.{js,ts}": [
+			"eslint --cache --fix"
+		]
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^19.3.0",
 		"@commitlint/config-conventional": "^19.2.2",
+		"@rollup/plugin-node-resolve": "^15.2.3",
+		"@types/node": "^20.12.12",
 		"@typescript-eslint/eslint-plugin": "^7.9.0",
 		"@typescript-eslint/parser": "^7.9.0",
 		"commitlint": "^19.3.0",
@@ -22,8 +32,11 @@
 		"eslint-plugin-prettier": "^5.1.3",
 		"eslint-plugin-simple-import-sort": "^12.1.0",
 		"husky": "^9.0.11",
+		"lint-staged": "^15.2.2",
 		"prettier": "^3.2.5",
 		"prettier-plugin-packagejson": "^2.5.0",
-		"rollup": "^4.17.2"
+		"rimraf": "^5.0.7",
+		"typescript": "^5.4.5",
+		"vite": "^5.2.11"
 	}
 }

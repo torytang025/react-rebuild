@@ -1,22 +1,28 @@
 {
-	"compileOnSave": true,
-	"include": ["./packages/**/*"],
 	"compilerOptions": {
-		"target": "ESNext",
-		"useDefineForClassFields": true,
-		"module": "ESNext",
-		"lib": ["ESNext", "DOM"],
-		"moduleResolution": "Node",
+		"composite": true,
 		"strict": true,
-		"sourceMap": true,
-		"resolveJsonModule": true,
-		"isolatedModules": true,
 		"esModuleInterop": true,
+		"skipLibCheck": true,
 		"noEmit": true,
+
+		"module": "ESNext",
+		"target": "ES6",
+		"moduleResolution": "Bundler",
+		"rootDir": "./packages",
+
+		/* Linting */
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
-		"noImplicitReturns": false,
-		"skipLibCheck": true,
-		"baseUrl": "./packages"
-	}
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": false
+	},
+	"references": [
+		{
+			"path": "./packages/shared"
+		},
+		{
+			"path": "./packages/react"
+		}
+	]
 }

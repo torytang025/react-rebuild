@@ -3,6 +3,18 @@
 	"version": "1.0.0",
 	"private": true,
 	"description": "A replicate of the React reconciler",
+	"type": "module",
+	"exports": {
+		".": {
+			"import": "./src/index.js",
+			"require": "./src/index.cjs",
+			"types": "./src/index.d.ts"
+		}
+	},
+	"scripts": {
+		"build": "vite build",
+		"dev": "vite"
+	},
 	"dependencies": {
 		"shared": "workspace:*"
 	}

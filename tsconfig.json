@@ -9,20 +9,25 @@
 		"module": "ESNext",
 		"target": "ES6",
 		"moduleResolution": "Bundler",
-		"rootDir": "./packages",
 
 		/* Linting */
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
-		"noImplicitReturns": false
+		"noImplicitReturns": false,
+
+		"types": ["vite/client"]
 	},
+	"include": ["packages/**/*", "globals.d.ts"],
 	"references": [
 		{
 			"path": "./packages/shared"
 		},
 		{
 			"path": "./packages/react"
+		},
+		{
+			"path": "./packages/react-reconciler"
 		}
 	]
 }

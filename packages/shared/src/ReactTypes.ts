@@ -4,13 +4,30 @@ export type Key = any;
 export type Ref = { current: any } | ((instance: any) => void) | null;
 
 export interface ReactElement {
+	/**
+	 * Annotation that marks the object as a React Element. We use this to determine if an object is a React Element.
+	 */
 	$$typeof: symbol | number;
+	/**
+	 * The type of the element. This can be a string (for built-in components) or a class/function (for composite components).
+	 */
 	type: Type;
+	/**
+	 * The props of the element.
+	 */
 	props: Props;
+	/**
+	 * The key of the element.
+	 */
 	key: Key;
+	/**
+	 * The ref of the element.
+	 */
 	ref: Ref;
 
-	// DEV only
+	/**
+	 * DEV only
+	 */
 	__version: string;
 }
 

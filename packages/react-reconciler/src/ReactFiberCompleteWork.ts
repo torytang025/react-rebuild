@@ -1,5 +1,5 @@
-import { FiberNode } from "./ReactFiber";
+import type { FiberNode } from "./ReactFiber";
 
-export function beginWork(fiber: FiberNode) {
+export function completeWork(fiber: FiberNode) {
 	return fiber;
 }

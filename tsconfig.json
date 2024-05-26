@@ -11,8 +11,6 @@
 		"moduleResolution": "Bundler",
 
 		/* Linting */
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitReturns": false,
 

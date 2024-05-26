@@ -1,8 +1,10 @@
-import { Key, Props, Ref } from "shared";
+import type { ReactElement, Type } from "shared";
+import { type Key, type Props, type Ref, type UpdateQueue } from "shared";
 
-import { Container } from "./ReactFiberConfig";
-import { Flags, NoFlags } from "./ReactFiberFlags";
-import { WorkTag } from "./ReactWorkTag";
+import type { Container } from "./ReactFiberConfig";
+import type { Flags } from "./ReactFiberFlags";
+import { NoFlags } from "./ReactFiberFlags";
+import { FunctionComponent, HostComponent, type WorkTag } from "./ReactWorkTag";
 
 /**
  * Represents a node in the Fiber tree. Each Fiber node corresponds to a React element/component.
@@ -46,7 +48,7 @@ import { WorkTag } from "./ReactWorkTag";
         └── FiberNode (tag: HostText, type: null, stateNode: "Hello, world!")
   ```
  */
-export class FiberNode {
+export class FiberNode<State = unknown> {
 	/**
 	 * the unique identifier for this fiber
 	 */
@@ -138,11 +140,11 @@ export class FiberNode {
 	/**
 	 * represents the internal state of a component
 	 */
-	memorizedState: any;
+	memorizedState: State | null;
 	/**
 	 * the queue of updates that need to be applied to this fiber
 	 */
-	updateQueue: unknown;
+	updateQueue: UpdateQueue<State> | null;
 
 	/**
 	 * links a fiber to its previous version (work-in-progress -> current), enabling efficient reconciliation between renders.
@@ -214,7 +216,7 @@ export class FiberRootNode {
 }
 
 /**
- * Creates a new work-in-progress fiber node.
+ * Creates a new work-in-progress fiber node from the current fiber node.
  */
 export function createWorkInProgress(
 	current: FiberNode,
@@ -244,4 +246,45 @@ export function createWorkInProgress(
 	workInProgress.memorizedProps = current.memorizedProps;
 
 	return workInProgress;
+}
+
+function createFiberFromTypeAndProps(
+	type: Type,
+	key: Key,
+	pendingProps: Props,
+) {
+	let fiberTag: WorkTag = FunctionComponent;
+
+	if (typeof type === "function") {
+		// TODO
+	}
+	// When the type is a string, it represents a host component (e.g., div, span, etc.).
+	else if (typeof type === "string") {
+		fiberTag = HostComponent;
+	} else {
+		const typeString = type === null ? "null" : typeof type;
+
+		throw new Error(
+			"Element type is invalid: expected a string (for built-in " +
+				"components) or a class/function (for composite components) " +
+				`but got: ${typeString}`,
+		);
+	}
+
+	const fiber = new FiberNode(fiberTag, pendingProps, key);
+	fiber.type = type;
+
+	return fiber;
+}
+
+export function createFiberFromElement(element: ReactElement): FiberNode {
+	const { key, props, type } = element;
+	return createFiberFromTypeAndProps(type, key, props);
+}
+
+export function createFiberFromText(pendingProps: Props, key: Key): FiberNode {
+	const fiber = new FiberNode(HostComponent, pendingProps, key);
+	fiber.type = null;
+
+	return fiber;
 }

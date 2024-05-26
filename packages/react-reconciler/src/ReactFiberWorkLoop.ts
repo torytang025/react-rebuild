@@ -1,10 +1,14 @@
-import { createWorkInProgress, FiberNode, FiberRootNode } from "./ReactFiber";
-import { completeWork } from "./ReactFiberBeginWork";
-import { beginWork } from "./ReactFiberCompleteWork";
+import type { FiberNode, FiberRootNode } from "./ReactFiber";
+import { createWorkInProgress } from "./ReactFiber";
+import { beginWork } from "./ReactFiberBeginWork";
+import { completeWork } from "./ReactFiberCompleteWork";
 import { HostRoot } from "./ReactWorkTag";
 
 let workInProgress: FiberNode | null = null;
 
+/**
+ * Prepares a fresh stack for the given root node, which is the entry point of the fiber tree.
+ */
 function prepareFreshStack(root: FiberRootNode) {
 	workInProgress = createWorkInProgress(root.current, {});
 }
@@ -32,6 +36,10 @@ function markUpdateFromFiberToRoot(fiber: FiberNode) {
 	return null;
 }
 
+/**
+ * Begins the rendering process starting from the root node.
+ * Prepares the fresh stack and enters the work loop.
+ */
 function renderRoot(root: FiberRootNode) {
 	prepareFreshStack(root);
 
@@ -39,10 +47,12 @@ function renderRoot(root: FiberRootNode) {
 		try {
 			workLoop();
 		} catch (error) {
-			console.error(
-				"An error occurred while rendering the component tree: ",
-				error,
-			);
+			if (import.meta.env.DEV) {
+				console.error(
+					"An error occurred while rendering the component tree: ",
+					error,
+				);
+			}
 			workInProgress = null;
 		}
 		// eslint-disable-next-line no-constant-condition

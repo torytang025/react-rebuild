@@ -19,6 +19,12 @@
 	"rules": {
 		"prettier/prettier": "error",
 		"@typescript-eslint/ban-ts-comment": "off",
+		"@typescript-eslint/consistent-type-imports": [
+			"error",
+			{
+				"prefer": "type-imports"
+			}
+		],
 		"simple-import-sort/imports": "error",
 		"simple-import-sort/exports": "error",
 		"import/no-cycle": "error"

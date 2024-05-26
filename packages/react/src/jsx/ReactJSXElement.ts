@@ -1,7 +1,6 @@
+import type { CreateElement, JSX } from "shared";
 import {
-	CreateElement,
 	hasOwnProperty,
-	JSX,
 	type Key,
 	type Props,
 	REACT_ELEMENT_TYPE,

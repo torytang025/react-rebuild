@@ -32,7 +32,7 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 		currentFirstChild: FiberNode | null,
 		content: string,
 	) {
-		const fiber = createFiberFromText({ content }, null);
+		const fiber = createFiberFromText(content, null);
 		fiber.return = returnFiber;
 
 		return fiber;

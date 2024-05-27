@@ -151,7 +151,14 @@ export class FiberNode<State = unknown> {
 	 * only exists during the process of generating a new fiber node tree.
 	 */
 	alternate: FiberNode | null;
+	/**
+	 * a collection of flags that represent the current state of the fiber
+	 */
 	flags: Flags;
+	/**
+	 * a collection of flags that represent the state of the subtree rooted at this fiber
+	 */
+	subtreeFlags: Flags;
 
 	constructor(tag: WorkTag, pendingProps: Props, key: Key) {
 		this.key = key;
@@ -172,7 +179,9 @@ export class FiberNode<State = unknown> {
 		this.updateQueue = null;
 
 		this.alternate = null;
+
 		this.flags = NoFlags;
+		this.subtreeFlags = NoFlags;
 	}
 }
 
@@ -236,6 +245,7 @@ export function createWorkInProgress(
 		// We need to reset it to its original state.
 		workInProgress.pendingProps = pendingProps;
 		workInProgress.flags = NoFlags;
+		workInProgress.subtreeFlags = NoFlags;
 	}
 
 	// Reset all the other fields of the work-in-progress fiber.
@@ -282,8 +292,8 @@ export function createFiberFromElement(element: ReactElement): FiberNode {
 	return createFiberFromTypeAndProps(type, key, props);
 }
 
-export function createFiberFromText(pendingProps: Props, key: Key): FiberNode {
-	const fiber = new FiberNode(HostComponent, pendingProps, key);
+export function createFiberFromText(content: string, key: Key): FiberNode {
+	const fiber = new FiberNode(HostComponent, content, key);
 	fiber.type = null;
 
 	return fiber;

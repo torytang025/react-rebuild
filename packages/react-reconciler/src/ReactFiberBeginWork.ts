@@ -9,13 +9,19 @@ import { HostComponent, HostRoot, HostText } from "./ReactWorkTag";
  * 1. compute the next state of the fiber node
  * 2. create child fibers for the fiber node
  */
-export function beginWork(workInProgress: FiberNode) {
+export function beginWork(
+	current: FiberNode | null,
+	workInProgress: FiberNode,
+) {
 	switch (workInProgress.tag) {
 		case HostRoot:
-			return updateHostRoot(workInProgress as FiberNode<Element | null>);
+			return updateHostRoot(
+				current,
+				workInProgress as FiberNode<Element | null>,
+			);
 
 		case HostComponent:
-			return updateHostComponent(workInProgress);
+			return updateHostComponent(current, workInProgress);
 
 		case HostText:
 			return updateHostText();
@@ -36,7 +42,10 @@ export function beginWork(workInProgress: FiberNode) {
  * In the case of the root fiber node, the pending update is the element to render,
  * which is the element passed to ReactDOM.createRoot().render().
  */
-function updateHostRoot(workInProgress: FiberNode<Element | null>) {
+function updateHostRoot(
+	current: FiberNode | null,
+	workInProgress: FiberNode<Element | null>,
+) {
 	// This is null for the first render pass.
 	const baseSate = workInProgress.memorizedState;
 	const updateQueue = workInProgress.updateQueue!;
@@ -48,7 +57,7 @@ function updateHostRoot(workInProgress: FiberNode<Element | null>) {
 	workInProgress.memorizedState = memorizedState;
 
 	const nextChildren = workInProgress.memorizedState;
-	reconcileChildren(workInProgress, nextChildren);
+	reconcileChildren(current, workInProgress, nextChildren);
 
 	return workInProgress.child;
 }
@@ -61,10 +70,13 @@ function updateHostRoot(workInProgress: FiberNode<Element | null>) {
  * which is the props passed to the component in the render method, e.g. <div className="foo" />.
  *
  */
-function updateHostComponent(workInProgress: FiberNode) {
+function updateHostComponent(
+	current: FiberNode | null,
+	workInProgress: FiberNode,
+) {
 	const nextProps = workInProgress.pendingProps;
 	const nextChildren = nextProps.children;
-	reconcileChildren(workInProgress, nextChildren);
+	reconcileChildren(current, workInProgress, nextChildren);
 
 	return workInProgress.child;
 }
@@ -79,9 +91,11 @@ function updateHostText() {
 	return null;
 }
 
-function reconcileChildren(workInProgress: FiberNode<any>, nextChildren: any) {
-	const current = workInProgress.alternate;
-
+function reconcileChildren(
+	current: FiberNode | null,
+	workInProgress: FiberNode<any>,
+	nextChildren: any,
+) {
 	// If this is a new component that has never been rendered before, there is no current fiber.
 	// For minimal side-effects, we only create child fibers but do not tag them with the Placement tag.
 	// These children will be placed with the return fiber's Placement tag.

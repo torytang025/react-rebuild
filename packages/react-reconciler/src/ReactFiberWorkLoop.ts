@@ -65,29 +65,31 @@ function workLoop() {
 	}
 }
 
-function performUnitOfWork(fiber: FiberNode) {
-	const next = beginWork(fiber);
-	fiber.memorizedProps = fiber.pendingProps;
+function performUnitOfWork(unitOfWork: FiberNode) {
+	const current = unitOfWork.alternate;
+	const next = beginWork(current, unitOfWork);
+	unitOfWork.memorizedProps = unitOfWork.pendingProps;
 
 	if (next !== null) {
 		workInProgress = next;
 	} else {
-		completeUnitOfWork(fiber);
+		completeUnitOfWork(unitOfWork);
 	}
 }
 
-function completeUnitOfWork(fiber: FiberNode) {
-	let node: FiberNode | null = fiber;
+function completeUnitOfWork(unitOfWork: FiberNode) {
+	let completedWork: FiberNode | null = unitOfWork;
 
 	do {
-		completeWork(node);
+		const current = completedWork.alternate;
+		completeWork(current, completedWork);
 
-		const sibling = node.sibling;
+		const sibling = completedWork.sibling;
 		if (sibling !== null) {
 			workInProgress = sibling;
 			return;
 		}
-		node = node.return;
-		workInProgress = node;
-	} while (node !== null);
+		completedWork = completedWork.return;
+		workInProgress = completedWork;
+	} while (completedWork !== null);
 }

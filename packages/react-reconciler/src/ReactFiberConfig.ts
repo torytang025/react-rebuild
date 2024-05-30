@@ -16,4 +16,11 @@ export declare function appendInitialChild(
 	child: Instance,
 ): void;
 
+export declare function appendChild(parent: Instance, child: Instance): void;
+
+export declare function appendChildToContainer(
+	parent: Container,
+	child: Instance,
+): void;
+
 throw new Error("This module must be shimmed by a specific renderer.");

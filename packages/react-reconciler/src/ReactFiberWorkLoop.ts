@@ -1,7 +1,9 @@
 import type { FiberNode, FiberRootNode } from "./ReactFiber";
 import { createWorkInProgress } from "./ReactFiber";
 import { beginWork } from "./ReactFiberBeginWork";
+import { commitMutationEffects } from "./ReactFiberCommitWork";
 import { completeWork } from "./ReactFiberCompleteWork";
+import { MutationMask, NoFlags } from "./ReactFiberFlags";
 import { HostRoot } from "./ReactWorkTag";
 
 let workInProgress: FiberNode | null = null;
@@ -57,6 +59,35 @@ function renderRoot(root: FiberRootNode) {
 		}
 		// eslint-disable-next-line no-constant-condition
 	} while (true);
+
+	const finishedWork = root.current.alternate;
+	root.finishedWork = finishedWork;
+
+	commitRoot(root);
+}
+
+function commitRoot(root: FiberRootNode) {
+	const finishedWork = root.current.alternate;
+
+	if (finishedWork === null) {
+		return;
+	}
+
+	root.finishedWork = null;
+
+	const subtreeHasEffects =
+		(finishedWork.subtreeFlags & MutationMask) !== NoFlags;
+	const rootHasEffects = (finishedWork.flags & MutationMask) !== NoFlags;
+
+	if (subtreeHasEffects || rootHasEffects) {
+		// Before mutation
+		// Mutation
+		commitMutationEffects(root, finishedWork);
+		root.current = finishedWork;
+		// Layout
+	} else {
+		root.current = finishedWork;
+	}
 }
 
 function workLoop() {

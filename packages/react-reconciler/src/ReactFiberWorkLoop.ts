@@ -1,9 +1,10 @@
-import type { FiberNode, FiberRootNode } from "./ReactFiber";
+import type { FiberNode } from "./ReactFiber";
 import { createWorkInProgress } from "./ReactFiber";
 import { beginWork } from "./ReactFiberBeginWork";
 import { commitMutationEffects } from "./ReactFiberCommitWork";
 import { completeWork } from "./ReactFiberCompleteWork";
 import { MutationMask, NoFlags } from "./ReactFiberFlags";
+import type { FiberRootNode } from "./ReactFiberRoot";
 import { HostRoot } from "./ReactWorkTag";
 
 let workInProgress: FiberNode | null = null;

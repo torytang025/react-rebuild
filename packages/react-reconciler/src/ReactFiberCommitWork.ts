@@ -1,4 +1,4 @@
-import type { FiberNode, FiberRootNode } from "./ReactFiber";
+import type { FiberNode } from "./ReactFiber";
 import {
 	appendChild,
 	appendChildToContainer,
@@ -6,6 +6,7 @@ import {
 	type Instance,
 } from "./ReactFiberConfig";
 import { MutationMask, Placement } from "./ReactFiberFlags";
+import type { FiberRootNode } from "./ReactFiberRoot";
 import { HostComponent, HostRoot, HostText } from "./ReactWorkTag";
 
 export function commitMutationEffects(

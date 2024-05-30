@@ -6,14 +6,8 @@
 	"type": "module",
 	"exports": {
 		".": {
-			"import": "./src/index.js",
-			"require": "./src/index.cjs",
-			"types": "./src/index.d.ts"
+			"import": "./src/index.ts"
 		}
-	},
-	"scripts": {
-		"build": "vite build",
-		"dev": "vite"
 	},
 	"dependencies": {
 		"shared": "workspace:*"

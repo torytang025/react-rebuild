@@ -6,3 +6,5 @@ dist
 .eslintcache
 
 tsconfig.tsbuildinfo
+
+.DS_Store

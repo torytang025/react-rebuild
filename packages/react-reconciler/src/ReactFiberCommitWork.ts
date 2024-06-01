@@ -98,7 +98,7 @@ function getHostParentFiber(fiber: FiberNode): FiberNode {
 function commitPlacement(finishedWork: FiberNode) {
 	const parentFiber = getHostParentFiber(finishedWork);
 
-	switch (finishedWork.tag) {
+	switch (parentFiber.tag) {
 		case HostComponent: {
 			const parent: Instance = parentFiber.stateNode;
 			insertOrAppendPlacementNode(finishedWork, parent);

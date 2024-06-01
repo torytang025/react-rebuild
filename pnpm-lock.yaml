@@ -66,26 +66,15 @@ importers:
         specifier: ^4.3.2
         version: 4.3.2(typescript@5.4.5)(vite@5.2.11)
 
-  packages/react:
-    dependencies:
-      shared:
-        specifier: workspace:*
-        version: link:../shared
+  packages/react: {}
 
   packages/react-dom:
     dependencies:
       react:
         specifier: workspace:*
         version: link:../react
-      shared:
-        specifier: workspace:*
-        version: link:../shared
 
-  packages/react-reconciler:
-    dependencies:
-      shared:
-        specifier: workspace:*
-        version: link:../shared
+  packages/react-reconciler: {}
 
   packages/shared: {}
 

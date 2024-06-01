@@ -1,4 +1,4 @@
-import type { Props } from "shared";
+import type { Props } from "@/shared";
 
 export type Container = Element;
 export type Instance = Element;

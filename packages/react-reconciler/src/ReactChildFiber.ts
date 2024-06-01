@@ -1,4 +1,4 @@
-import { REACT_ELEMENT_TYPE, type ReactElement } from "shared";
+import { REACT_ELEMENT_TYPE, type ReactElement } from "@/shared";
 
 import {
 	createFiberFromElement,

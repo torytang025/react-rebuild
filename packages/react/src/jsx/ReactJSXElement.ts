@@ -1,13 +1,13 @@
-import type { CreateElement, JSX } from "shared";
-import {
-	hasOwnProperty,
-	type Key,
-	type Props,
-	REACT_ELEMENT_TYPE,
-	type ReactElement as ReactElementType,
-	type Ref,
-	type Type,
-} from "shared";
+import type {
+	CreateElement,
+	JSX,
+	Key,
+	Props,
+	ReactElement as ReactElementType,
+	Ref,
+	Type,
+} from "@/shared";
+import { hasOwnProperty, REACT_ELEMENT_TYPE } from "@/shared";
 
 export const ReactElement = (
 	type: Type,

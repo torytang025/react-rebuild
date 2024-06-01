@@ -1,7 +1,7 @@
 {
 	"name": "react-dom",
 	"version": "1.0.0",
-	"description": "A replicate of react-dom",
+	"description": "Dom renderer for React",
 	"type": "module",
 	"exports": {
 		".": {
@@ -18,9 +18,6 @@
 	"scripts": {
 		"build": "vite build",
 		"dev": "vite"
-	},
-	"dependencies": {
-		"shared": "workspace:*"
 	},
 	"peerDependencies": {
 		"react": "workspace:*"

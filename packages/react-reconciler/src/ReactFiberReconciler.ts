@@ -1,5 +1,6 @@
 import { type Container } from "ReactFiberConfig";
-import { type ReactElement, type UpdateQueue } from "shared";
+
+import type { ReactElement, UpdateQueue } from "@/shared";
 
 import { FiberNode } from "./ReactFiber";
 import { FiberRootNode } from "./ReactFiberRoot";

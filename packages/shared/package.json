@@ -2,15 +2,5 @@
 	"name": "shared",
 	"version": "1.0.0",
 	"private": true,
-	"type": "module",
-	"exports": {
-		".": {
-			"import": "./dist/index.js",
-			"types": "./dist/index.d.ts"
-		}
-	},
-	"scripts": {
-		"build": "vite build",
-		"dev": "tsc -w"
-	}
+	"description": "Shared code for all projects"
 }

@@ -1,5 +1,11 @@
-import type { ReactElement, Type } from "shared";
-import { type Key, type Props, type Ref, type UpdateQueue } from "shared";
+import type {
+	Key,
+	Props,
+	ReactElement,
+	Ref,
+	Type,
+	UpdateQueue,
+} from "@/shared";
 
 import type { Flags } from "./ReactFiberFlags";
 import { NoFlags } from "./ReactFiberFlags";

@@ -1,10 +1,7 @@
 {
 	"name": "react",
 	"version": "1.0.0",
-	"description": "common functions for react",
-	"keywords": [],
-	"license": "ISC",
-	"author": "",
+	"description": "Core functions for React",
 	"type": "module",
 	"exports": {
 		".": {
@@ -27,8 +24,5 @@
 	"module": "./dist/index.js",
 	"scripts": {
 		"build": "vite build"
-	},
-	"dependencies": {
-		"shared": "workspace:*"
 	}
 }

@@ -1,6 +1,5 @@
-import type { ReactElement } from "shared";
-
 import { createContainer, updateContainer } from "@/react-reconciler";
+import type { ReactElement } from "@/shared";
 
 import type { Container } from "./ReactFiberConfigDOM";
 

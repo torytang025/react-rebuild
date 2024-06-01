@@ -1,10 +1,11 @@
-import type { FiberNode } from "./ReactFiber";
 import {
 	appendChild,
 	appendChildToContainer,
 	type Container,
 	type Instance,
-} from "./ReactFiberConfig";
+} from "ReactFiberConfig";
+
+import type { FiberNode } from "./ReactFiber";
 import { MutationMask, Placement } from "./ReactFiberFlags";
 import type { FiberRootNode } from "./ReactFiberRoot";
 import { HostComponent, HostRoot, HostText } from "./ReactWorkTag";

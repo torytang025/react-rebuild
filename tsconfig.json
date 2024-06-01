@@ -16,7 +16,7 @@
 
 		"types": ["vite/client"]
 	},
-	"include": ["packages/**/*", "globals.d.ts"],
+	"include": ["packages/**/*"],
 	"references": [
 		{
 			"path": "./packages/shared"

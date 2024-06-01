@@ -1,5 +1,6 @@
+import type { Container } from "ReactFiberConfig";
+
 import type { FiberNode } from "./ReactFiber";
-import type { Container } from "./ReactFiberConfig";
 
 /**
  * This is an internal structure in React Fiber that contains the information needed to manage the root of the React application.

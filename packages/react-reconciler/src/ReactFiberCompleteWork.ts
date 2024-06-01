@@ -1,10 +1,11 @@
-import type { FiberNode } from "./ReactFiber";
-import type { Instance } from "./ReactFiberConfig";
 import {
 	appendInitialChild,
 	createInstance,
 	createTextInstance,
-} from "./ReactFiberConfig";
+	type Instance,
+} from "ReactFiberConfig";
+
+import type { FiberNode } from "./ReactFiber";
 import type { Flags } from "./ReactFiberFlags";
 import { NoFlags } from "./ReactFiberFlags";
 import { HostComponent, HostRoot, HostText } from "./ReactWorkTag";

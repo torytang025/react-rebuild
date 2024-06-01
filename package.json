@@ -7,9 +7,10 @@
 	"author": "",
 	"main": "index.js",
 	"scripts": {
-		"build": "pnpm clean && pnpm -r build && pnpm build:type",
+		"build": "pnpm clean:dist && pnpm -r build && pnpm build:type",
 		"build:type": "rimraf --glob '**/*.tsbuildinfo' && tsc --build",
-		"clean": "rimraf --glob '**/dist'",
+		"clean": "rimraf node_modules packages/*/node_modules",
+		"clean:dist": "rimraf --glob '**/dist'",
 		"lint": "eslint --ext .js,.ts,.jsx,.tsx --fix --quiet ./packages",
 		"prepare": "husky"
 	},
@@ -21,7 +22,6 @@
 	"devDependencies": {
 		"@commitlint/cli": "^19.3.0",
 		"@commitlint/config-conventional": "^19.2.2",
-		"@rollup/plugin-node-resolve": "^15.2.3",
 		"@types/node": "^20.12.12",
 		"@typescript-eslint/eslint-plugin": "^7.9.0",
 		"@typescript-eslint/parser": "^7.9.0",

@@ -14,6 +14,11 @@
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitReturns": false,
 
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["packages/*/src"]
+		},
+
 		"types": ["vite/client"]
 	},
 	"include": ["packages/**/*"],
@@ -26,6 +31,9 @@
 		},
 		{
 			"path": "./packages/react-reconciler"
+		},
+		{
+			"path": "./packages/react-dom"
 		}
 	]
 }

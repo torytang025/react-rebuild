@@ -49,6 +49,7 @@ function renderRoot(root: FiberRootNode) {
 	do {
 		try {
 			workLoop();
+			break;
 		} catch (error) {
 			if (import.meta.env.DEV) {
 				console.error(

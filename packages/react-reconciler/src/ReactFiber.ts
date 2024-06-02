@@ -9,7 +9,12 @@ import type {
 
 import type { Flags } from "./ReactFiberFlags";
 import { NoFlags } from "./ReactFiberFlags";
-import { FunctionComponent, HostComponent, type WorkTag } from "./ReactWorkTag";
+import {
+	FunctionComponent,
+	HostComponent,
+	HostText,
+	type WorkTag,
+} from "./ReactWorkTag";
 
 /**
  * Represents a node in the Fiber tree. Each Fiber node corresponds to a React element/component.
@@ -259,8 +264,7 @@ export function createFiberFromElement(element: ReactElement): FiberNode {
 }
 
 export function createFiberFromText(content: string, key: Key): FiberNode {
-	const fiber = new FiberNode(HostComponent, content, key);
-	fiber.type = null;
+	const fiber = new FiberNode(HostText, content, key);
 
 	return fiber;
 }

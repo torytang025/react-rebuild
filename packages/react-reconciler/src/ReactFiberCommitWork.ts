@@ -70,11 +70,11 @@ function commitReconciliationEffects(finishedWork: FiberNode) {
 }
 
 function isHostParent(fiber: FiberNode) {
-	return fiber.type === HostComponent || fiber.type === HostRoot;
+	return fiber.tag === HostComponent || fiber.tag === HostRoot;
 }
 
 function isHostNode(fiber: FiberNode) {
-	return fiber.type === HostComponent || fiber.type === HostText;
+	return fiber.tag === HostComponent || fiber.tag === HostText;
 }
 
 /**
@@ -120,7 +120,7 @@ function commitPlacement(finishedWork: FiberNode) {
  * Insert or append a fiber node to the parent in the host environment.
  */
 function insertOrAppendPlacementNode(node: FiberNode, parent: Instance) {
-	const isHost = isHostNode(node.type);
+	const isHost = isHostNode(node);
 	if (isHost) {
 		const stateNode = node.stateNode;
 		appendChild(parent, stateNode);
@@ -144,7 +144,7 @@ function insertOrAppendPlacementNodeIntoContainer(
 	node: FiberNode,
 	parent: Container,
 ) {
-	const isHost = isHostNode(node.type);
+	const isHost = isHostNode(node);
 	if (isHost) {
 		const stateNode = node.stateNode;
 		appendChildToContainer(parent, stateNode);

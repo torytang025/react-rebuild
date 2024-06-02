@@ -5,6 +5,8 @@ import {
 	type Instance,
 } from "ReactFiberConfig";
 
+import { logger } from "@/shared";
+
 import type { FiberNode } from "./ReactFiber";
 import type { Flags } from "./ReactFiberFlags";
 import { NoFlags } from "./ReactFiberFlags";
@@ -16,7 +18,11 @@ export function completeWork(
 ): null {
 	const newProps = workInProgress.pendingProps;
 	const type = workInProgress.type;
-	switch (workInProgress.tag) {
+	const tag = workInProgress.tag;
+
+	logger.info("completeWork", tag, type);
+
+	switch (tag) {
 		case HostRoot:
 			// TODO: update the root instance
 			bubbleProperties(workInProgress);
@@ -44,9 +50,7 @@ export function completeWork(
 			return null;
 		}
 		default:
-			if (import.meta.env.DEV) {
-				console.error("Unknown fiber tag: ", workInProgress.tag);
-			}
+			logger.error("Unknown fiber tag: ", workInProgress.tag);
 			break;
 	}
 

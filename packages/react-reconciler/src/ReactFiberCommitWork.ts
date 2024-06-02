@@ -5,6 +5,8 @@ import {
 	type Instance,
 } from "ReactFiberConfig";
 
+import { logger } from "@/shared";
+
 import type { FiberNode } from "./ReactFiber";
 import { MutationMask, Placement } from "./ReactFiberFlags";
 import type { FiberRootNode } from "./ReactFiberRoot";
@@ -63,7 +65,10 @@ function commitMutationEffectsOnFiber(
 
 function commitReconciliationEffects(finishedWork: FiberNode) {
 	const flags = finishedWork.flags;
+
 	if (flags & Placement) {
+		logger.info("commitPlacement", finishedWork.type);
+
 		commitPlacement(finishedWork);
 		finishedWork.flags &= ~Placement;
 	}
@@ -90,7 +95,7 @@ function getHostParentFiber(fiber: FiberNode): FiberNode {
 		}
 	}
 
-	throw new Error("Expected to find a host parent.");
+	return logger.error("Expected to find a host parent.");
 }
 
 /**
@@ -112,7 +117,8 @@ function commitPlacement(finishedWork: FiberNode) {
 			break;
 		}
 		default:
-			throw Error("Invalid host parent fiber.");
+			logger.error("Invalid host parent fiber", parentFiber.tag);
+			return;
 	}
 }
 

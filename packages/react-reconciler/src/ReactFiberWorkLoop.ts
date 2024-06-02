@@ -1,3 +1,5 @@
+import { logger } from "@/shared";
+
 import type { FiberNode } from "./ReactFiber";
 import { createWorkInProgress } from "./ReactFiber";
 import { beginWork } from "./ReactFiberBeginWork";
@@ -51,12 +53,10 @@ function renderRoot(root: FiberRootNode) {
 			workLoop();
 			break;
 		} catch (error) {
-			if (import.meta.env.DEV) {
-				console.error(
-					"An error occurred while rendering the component tree: ",
-					error,
-				);
-			}
+			logger.error(
+				"An error occurred while rendering the component tree: ",
+				error,
+			);
 			workInProgress = null;
 		}
 		// eslint-disable-next-line no-constant-condition

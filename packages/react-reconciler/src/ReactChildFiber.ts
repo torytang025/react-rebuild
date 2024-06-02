@@ -1,4 +1,4 @@
-import { REACT_ELEMENT_TYPE, type ReactElement } from "@/shared";
+import { logger, REACT_ELEMENT_TYPE, type ReactElement } from "@/shared";
 
 import {
 	createFiberFromElement,
@@ -51,9 +51,7 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 					);
 
 				default:
-					if (import.meta.env.DEV) {
-						console.error("Invalid child type", nextChild);
-					}
+					logger.error("Invalid child type", nextChild);
 					break;
 			}
 		}
@@ -66,9 +64,7 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 			);
 		}
 
-		if (import.meta.env.DEV) {
-			console.error("Invalid child type", nextChild);
-		}
+		logger.error("Invalid child type", nextChild);
 		return null;
 	}
 

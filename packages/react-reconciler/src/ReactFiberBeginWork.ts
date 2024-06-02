@@ -1,3 +1,5 @@
+import { logger } from "@/shared";
+
 import { mountChildFibers, reconcileChildFibers } from "./ReactChildFiber";
 import type { FiberNode } from "./ReactFiber";
 import { processUpdateQueue } from "./ReactFiberUpdateQueue";
@@ -13,6 +15,8 @@ export function beginWork(
 	current: FiberNode | null,
 	workInProgress: FiberNode,
 ) {
+	logger.info("beginWork", workInProgress.tag, workInProgress.type);
+
 	switch (workInProgress.tag) {
 		case HostRoot:
 			return updateHostRoot(
@@ -27,11 +31,10 @@ export function beginWork(
 			return updateHostText();
 
 		default:
-			if (import.meta.env.DEV) {
-				console.error("Unknown fiber tag: ", workInProgress.tag);
-			}
+			logger.error("Unknown fiber tag: ", workInProgress.tag);
 			break;
 	}
+
 	return null;
 }
 

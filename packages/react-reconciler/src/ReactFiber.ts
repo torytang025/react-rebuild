@@ -6,6 +6,7 @@ import type {
 	Type,
 	UpdateQueue,
 } from "@/shared";
+import { logger } from "@/shared";
 
 import type { Flags } from "./ReactFiberFlags";
 import { NoFlags } from "./ReactFiberFlags";
@@ -245,10 +246,9 @@ function createFiberFromTypeAndProps(
 	} else {
 		const typeString = type === null ? "null" : typeof type;
 
-		throw new Error(
-			"Element type is invalid: expected a string (for built-in " +
-				"components) or a class/function (for composite components) " +
-				`but got: ${typeString}`,
+		logger.error(
+			"Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: ",
+			typeString,
 		);
 	}
 

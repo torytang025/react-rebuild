@@ -238,15 +238,15 @@ function createFiberFromTypeAndProps(
 	let fiberTag: WorkTag = FunctionComponent;
 
 	if (typeof type === "function") {
-		// TODO
-	}
-	// When the type is a string, it represents a host component (e.g., div, span, etc.).
-	else if (typeof type === "string") {
+		logger.info("Create Fiber from a function component:", type.name);
+	} else if (typeof type === "string") {
+		logger.info("Create Fiber from a host component:", type);
+		// When the type is a string, it represents a host component (e.g., div, span, etc.).
 		fiberTag = HostComponent;
 	} else {
 		const typeString = type === null ? "null" : typeof type;
 
-		logger.error(
+		return logger.error(
 			"Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: ",
 			typeString,
 		);

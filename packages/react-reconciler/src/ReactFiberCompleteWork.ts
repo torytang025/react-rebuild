@@ -10,7 +10,12 @@ import { logger } from "@/shared";
 import type { FiberNode } from "./ReactFiber";
 import type { Flags } from "./ReactFiberFlags";
 import { NoFlags } from "./ReactFiberFlags";
-import { HostComponent, HostRoot, HostText } from "./ReactWorkTag";
+import {
+	FunctionComponent,
+	HostComponent,
+	HostRoot,
+	HostText,
+} from "./ReactWorkTag";
 
 export function completeWork(
 	current: FiberNode | null,
@@ -24,7 +29,7 @@ export function completeWork(
 
 	switch (tag) {
 		case HostRoot:
-			// TODO: update the root instance
+		case FunctionComponent:
 			bubbleProperties(workInProgress);
 			return null;
 		case HostComponent: {
@@ -50,13 +55,16 @@ export function completeWork(
 			return null;
 		}
 		default:
-			logger.error("Unknown fiber tag: ", workInProgress.tag);
-			break;
+			return logger.error(
+				"[ReactCompleteWork] Unknown fiber tag: ",
+				workInProgress.tag,
+			);
 	}
-
-	return null;
 }
 
+/**
+ * Append all children of the current fiber node to the parent instance.
+ */
 function appendAllChildren(parent: Instance, workInProgress: FiberNode) {
 	let node = workInProgress.child;
 

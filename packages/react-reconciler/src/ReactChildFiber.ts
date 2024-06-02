@@ -51,8 +51,10 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 					);
 
 				default:
-					logger.error("Invalid child type", nextChild);
-					break;
+					return logger.error(
+						"[ReactChildFiber] Invalid child type:",
+						typeof nextChild,
+					);
 			}
 		}
 
@@ -64,8 +66,10 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 			);
 		}
 
-		logger.error("Invalid child type", nextChild);
-		return null;
+		return logger.error(
+			"[ReactChildFiber] Invalid child type:",
+			typeof nextChild,
+		);
 	}
 
 	return reconcileChildFiber;

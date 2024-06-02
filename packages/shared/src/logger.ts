@@ -6,7 +6,9 @@ function processArgs(args: any[]) {
 	}
 
 	for (let i = 0; i < args.length; i++) {
-		if (typeof args[i] === "object") {
+		if (typeof args[i] === "function") {
+			result += args[i].name + " ";
+		} else if (typeof args[i] === "object") {
 			result += JSON.stringify(args[i]) + " ";
 		} else {
 			result += args[i] + " ";

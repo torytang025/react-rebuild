@@ -10,7 +10,12 @@ import { logger } from "@/shared";
 import type { FiberNode } from "./ReactFiber";
 import { MutationMask, Placement } from "./ReactFiberFlags";
 import type { FiberRootNode } from "./ReactFiberRoot";
-import { HostComponent, HostRoot, HostText } from "./ReactWorkTag";
+import {
+	FunctionComponent,
+	HostComponent,
+	HostRoot,
+	HostText,
+} from "./ReactWorkTag";
 
 export function commitMutationEffects(
 	root: FiberRootNode,
@@ -40,6 +45,11 @@ function commitMutationEffectsOnFiber(
 	finishedWork: FiberNode,
 ) {
 	switch (finishedWork.tag) {
+		case FunctionComponent: {
+			recursivelyTraverseMutationEffects(root, finishedWork);
+			commitReconciliationEffects(finishedWork);
+			return;
+		}
 		case HostComponent: {
 			recursivelyTraverseMutationEffects(root, finishedWork);
 			commitReconciliationEffects(finishedWork);
@@ -117,8 +127,7 @@ function commitPlacement(finishedWork: FiberNode) {
 			break;
 		}
 		default:
-			logger.error("Invalid host parent fiber", parentFiber.tag);
-			return;
+			return logger.error("Invalid host parent fiber", parentFiber.tag);
 	}
 }
 
@@ -133,10 +142,10 @@ function insertOrAppendPlacementNode(node: FiberNode, parent: Instance) {
 	} else {
 		const child = node.child;
 		if (child !== null) {
-			insertOrAppendPlacementNode(parent, child);
+			insertOrAppendPlacementNode(child, parent);
 			let sibling = child.sibling;
 			while (sibling !== null) {
-				insertOrAppendPlacementNode(parent, sibling);
+				insertOrAppendPlacementNode(sibling, parent);
 				sibling = sibling.sibling;
 			}
 		}
@@ -157,10 +166,10 @@ function insertOrAppendPlacementNodeIntoContainer(
 	} else {
 		const child = node.child;
 		if (child !== null) {
-			insertOrAppendPlacementNode(parent, child);
+			insertOrAppendPlacementNodeIntoContainer(child, parent);
 			let sibling = child.sibling;
 			while (sibling !== null) {
-				insertOrAppendPlacementNode(parent, sibling);
+				insertOrAppendPlacementNodeIntoContainer(sibling, parent);
 				sibling = sibling.sibling;
 			}
 		}

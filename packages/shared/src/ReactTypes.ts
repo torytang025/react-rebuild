@@ -3,6 +3,8 @@ export type Props = any;
 export type Key = any;
 export type Ref = { current: any } | ((instance: any) => void) | null;
 
+export type Component = any;
+
 export interface ReactElement {
 	/**
 	 * Annotation that marks the object as a React Element. We use this to determine if an object is a React Element.

@@ -7,11 +7,12 @@
 	"author": "",
 	"main": "index.js",
 	"scripts": {
-		"build": "pnpm clean:dist && pnpm -r build && pnpm build:type",
-		"build:dev": "NODE_ENV=development pnpm -r dev",
+		"build": "pnpm clean:dist && pnpm -r --filter='./packages/**' run build && pnpm build:type",
 		"build:type": "rimraf --glob '**/*.tsbuildinfo' && tsc --build",
-		"clean": "rimraf node_modules packages/*/node_modules",
 		"clean:dist": "rimraf --glob '**/dist'",
+		"clean:nm": "rimraf node_modules packages/*/node_modules",
+		"demo:react": "pnpm -r --filter='./demos/react' run dev",
+		"dev": "NODE_ENV=development pnpm -r --filter='./packages/**' dev",
 		"lint": "eslint --ext .js,.ts,.jsx,.tsx --fix --quiet ./packages",
 		"prepare": "husky"
 	},

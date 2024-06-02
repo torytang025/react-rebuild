@@ -23,6 +23,7 @@
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.js",
 	"scripts": {
-		"build": "vite build"
+		"build": "vite build",
+		"dev": "vite build --watch --mode development"
 	}
 }

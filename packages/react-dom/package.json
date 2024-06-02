@@ -17,7 +17,7 @@
 	},
 	"scripts": {
 		"build": "vite build",
-		"dev": "vite"
+		"dev": "vite build --watch --mode development"
 	},
 	"peerDependencies": {
 		"react": "workspace:*"

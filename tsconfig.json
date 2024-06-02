@@ -21,7 +21,7 @@
 
 		"types": ["vite/client"]
 	},
-	"include": ["packages/**/*"],
+	"include": ["packages/**/*", "vite.config.ts"],
 	"references": [
 		{
 			"path": "./packages/shared"

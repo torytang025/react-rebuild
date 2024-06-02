@@ -1,4 +1,4 @@
-import { type Action, type Update, type UpdateQueue } from "shared";
+import type { Action, Update, UpdateQueue } from "@/shared";
 
 export function createUpdate<State>(action: Action<State>): Update<State> {
 	return {

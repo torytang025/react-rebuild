@@ -2,14 +2,5 @@
 	"name": "react-reconciler",
 	"version": "1.0.0",
 	"private": true,
-	"description": "A replicate of the React reconciler",
-	"type": "module",
-	"exports": {
-		".": {
-			"import": "./src/index.ts"
-		}
-	},
-	"dependencies": {
-		"shared": "workspace:*"
-	}
+	"description": "Reconciler for React"
 }

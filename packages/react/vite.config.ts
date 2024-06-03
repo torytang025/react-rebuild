@@ -1,7 +1,6 @@
 import type { UserConfig } from "vite";
 import { mergeConfig } from "vite";
 import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 import rootConfig from "../../vite.config.js";
 
@@ -17,6 +16,5 @@ export default defineConfig((config) => {
 				name: "React",
 			},
 		},
-		plugins: [tsconfigPaths()],
 	} satisfies UserConfig);
 });

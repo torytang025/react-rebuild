@@ -53,11 +53,11 @@ function renderRoot(root: FiberRootNode) {
 			workLoop();
 			break;
 		} catch (error) {
-			logger.error(
+			workInProgress = null;
+			return logger.error(
 				"An error occurred while rendering the component tree: ",
 				error,
 			);
-			workInProgress = null;
 		}
 		// eslint-disable-next-line no-constant-condition
 	} while (true);

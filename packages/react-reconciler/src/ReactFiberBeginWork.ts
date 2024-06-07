@@ -2,8 +2,14 @@ import { logger } from "@/shared";
 
 import { mountChildFibers, reconcileChildFibers } from "./ReactChildFiber";
 import type { FiberNode } from "./ReactFiber";
+import { renderWithHooks } from "./ReactFiberHooks";
 import { processUpdateQueue } from "./ReactFiberUpdateQueue";
-import { HostComponent, HostRoot, HostText } from "./ReactWorkTag";
+import {
+	FunctionComponent,
+	HostComponent,
+	HostRoot,
+	HostText,
+} from "./ReactWorkTag";
 
 /**
  * beginWork is called by performUnitOfWork to begin the work on a fiber node.
@@ -24,6 +30,9 @@ export function beginWork(
 				workInProgress as FiberNode<Element | null>,
 			);
 
+		case FunctionComponent:
+			return updateFunctionComponent(current, workInProgress);
+
 		case HostComponent:
 			return updateHostComponent(current, workInProgress);
 
@@ -31,11 +40,11 @@ export function beginWork(
 			return updateHostText();
 
 		default:
-			logger.error("Unknown fiber tag: ", workInProgress.tag);
-			break;
+			return logger.error(
+				"[ReactBeginWork] Unknown fiber tag: ",
+				workInProgress.tag,
+			);
 	}
-
-	return null;
 }
 
 /**
@@ -60,6 +69,23 @@ function updateHostRoot(
 	workInProgress.memorizedState = memorizedState;
 
 	const nextChildren = workInProgress.memorizedState;
+	reconcileChildren(current, workInProgress, nextChildren);
+
+	return workInProgress.child;
+}
+
+function updateFunctionComponent(
+	current: FiberNode | null,
+	workInProgress: FiberNode,
+) {
+	const Component = workInProgress.type;
+	const pendingProps = workInProgress.pendingProps;
+	const nextChildren = renderWithHooks(
+		current,
+		workInProgress,
+		Component,
+		pendingProps,
+	);
 	reconcileChildren(current, workInProgress, nextChildren);
 
 	return workInProgress.child;

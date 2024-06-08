@@ -1,4 +1,4 @@
-import type { Action, Update, UpdateQueue } from "@/shared";
+import type { Action, Update, UpdateQueue } from "shared/ReactTypes";
 
 export function createUpdate<State>(action: Action<State>): Update<State> {
 	return {
@@ -11,6 +11,7 @@ export function createUpdateQueue<State>(): UpdateQueue<State> {
 		shared: {
 			pending: null,
 		},
+		dispatch: null,
 	};
 }
 

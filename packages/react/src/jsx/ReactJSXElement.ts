@@ -1,3 +1,5 @@
+import { hasOwnProperty } from "shared/hasOwnProperty";
+import { REACT_ELEMENT_TYPE } from "shared/ReactSymbols";
 import type {
 	CreateElement,
 	JSX,
@@ -6,8 +8,7 @@ import type {
 	ReactElement as ReactElementType,
 	Ref,
 	Type,
-} from "@/shared";
-import { hasOwnProperty, REACT_ELEMENT_TYPE } from "@/shared";
+} from "shared/ReactTypes";
 
 export const ReactElement = (
 	type: Type,

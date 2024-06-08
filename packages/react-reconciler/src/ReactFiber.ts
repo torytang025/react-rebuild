@@ -1,3 +1,4 @@
+import { logger } from "shared/logger";
 import type {
 	Key,
 	Props,
@@ -5,8 +6,7 @@ import type {
 	Ref,
 	Type,
 	UpdateQueue,
-} from "@/shared";
-import { logger } from "@/shared";
+} from "shared/ReactTypes";
 
 import type { Flags } from "./ReactFiberFlags";
 import { NoFlags } from "./ReactFiberFlags";
@@ -224,8 +224,8 @@ export function createWorkInProgress(
 	workInProgress.type = current.type;
 	workInProgress.child = current.child;
 	workInProgress.updateQueue = current.updateQueue;
-	workInProgress.pendingProps = pendingProps;
 	workInProgress.memorizedProps = current.memorizedProps;
+	workInProgress.memorizedState = current.memorizedState;
 
 	return workInProgress;
 }

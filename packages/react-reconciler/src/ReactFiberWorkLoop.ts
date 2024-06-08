@@ -1,4 +1,4 @@
-import { logger } from "@/shared";
+import { logger } from "shared/logger";
 
 import type { FiberNode } from "./ReactFiber";
 import { createWorkInProgress } from "./ReactFiber";
@@ -18,7 +18,7 @@ function prepareFreshStack(root: FiberRootNode) {
 	workInProgress = createWorkInProgress(root.current, {});
 }
 
-export function scheduleUpdateOnFiber(fiber: FiberNode) {
+export function scheduleUpdateOnFiber(fiber: FiberNode<any>) {
 	const fiberRoot = markUpdateFromFiberToRoot(fiber);
 	renderRoot(fiberRoot);
 }
@@ -38,7 +38,10 @@ function markUpdateFromFiberToRoot(fiber: FiberNode) {
 	if (node.tag === HostRoot) {
 		return node.stateNode;
 	}
-	return null;
+
+	return logger.error(
+		"Failed to find the root node from the given fiber node.",
+	);
 }
 
 /**

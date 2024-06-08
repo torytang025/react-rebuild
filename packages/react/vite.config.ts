@@ -1,11 +1,24 @@
+import path from "path";
 import type { UserConfig } from "vite";
 import { mergeConfig } from "vite";
 import { defineConfig } from "vite";
+import dts from "vite-plugin-dts";
 
 import rootConfig from "../../vite.config.js";
 
 export default defineConfig((config) => {
 	return mergeConfig(rootConfig(config), {
+		resolve: {
+			alias: [
+				{
+					find: "shared/ReactSharedInternals",
+					replacement: path.resolve(
+						__dirname,
+						"src/ReactSharedInternalsClient.ts",
+					),
+				},
+			],
+		},
 		build: {
 			lib: {
 				entry: {
@@ -16,5 +29,13 @@ export default defineConfig((config) => {
 				name: "React",
 			},
 		},
+		plugins: [
+			dts({
+				rollupTypes: true,
+				root: ".",
+				entryRoot: "src",
+				outDir: "dist",
+			}),
+		],
 	} satisfies UserConfig);
 });

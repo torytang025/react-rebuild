@@ -7,8 +7,7 @@
 	"author": "",
 	"main": "index.js",
 	"scripts": {
-		"build": "pnpm clean:dist && pnpm -r --filter='./packages/**' run build && pnpm build:type",
-		"build:type": "rimraf --glob '**/*.tsbuildinfo' && tsc --build",
+		"build": "pnpm clean:dist && pnpm -r --filter='./packages/**' run build",
 		"clean:dist": "rimraf --glob '**/dist'",
 		"clean:nm": "rimraf node_modules packages/*/node_modules",
 		"demo:react": "pnpm -r --filter='./demos/react' run dev",
@@ -40,6 +39,7 @@
 		"rimraf": "^5.0.7",
 		"typescript": "^5.4.5",
 		"vite": "^5.2.11",
+		"vite-plugin-dts": "^3.9.1",
 		"vite-tsconfig-paths": "^4.3.2"
 	}
 }

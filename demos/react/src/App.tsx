@@ -1,7 +1,10 @@
+import { useState } from "react";
+
 function App() {
+	const [num, setNum] = useState(0);
 	return (
 		<div>
-			<h1>Hello React</h1>
+			<div>{num}</div>
 		</div>
 	);
 }

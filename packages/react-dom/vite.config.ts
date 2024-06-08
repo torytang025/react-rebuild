@@ -1,6 +1,7 @@
 import path from "path";
 import type { UserConfig } from "vite";
 import { defineConfig, mergeConfig } from "vite";
+import dts from "vite-plugin-dts";
 
 import rootConfig from "../../vite.config.js";
 
@@ -26,6 +27,17 @@ export default defineConfig((config) => {
 					client: "src/client/index.ts",
 				},
 			},
+			rollupOptions: {
+				external: ["react"],
+			},
 		},
+		plugins: [
+			dts({
+				root: ".",
+				entryRoot: "src",
+				outDir: "dist",
+				rollupTypes: true,
+			}),
+		],
 	} satisfies UserConfig);
 });

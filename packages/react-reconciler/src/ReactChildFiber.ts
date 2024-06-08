@@ -1,4 +1,6 @@
-import { logger, REACT_ELEMENT_TYPE, type ReactElement } from "@/shared";
+import { logger } from "shared/logger";
+import { REACT_ELEMENT_TYPE } from "shared/ReactSymbols";
+import type { ReactElement } from "shared/ReactTypes";
 
 import {
 	createFiberFromElement,

@@ -4,8 +4,7 @@ import {
 	type Container,
 	type Instance,
 } from "ReactFiberConfig";
-
-import { logger } from "@/shared";
+import { logger } from "shared/logger";
 
 import type { FiberNode } from "./ReactFiber";
 import { MutationMask, Placement } from "./ReactFiberFlags";

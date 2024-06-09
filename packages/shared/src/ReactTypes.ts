@@ -68,4 +68,15 @@ export type SharedQueue<State> = {
  */
 export type UpdateQueue<State> = {
 	shared: SharedQueue<State>;
+	dispatch: Dispatch<State> | null;
+};
+
+export type InitialState<S> = S | (() => S);
+export type Dispatch<S> = (action: Action<S>) => void;
+export type SetStateReturn<S> = [S, Dispatch<S>];
+
+export type UseState = <S>(initialState: InitialState<S>) => SetStateReturn<S>;
+
+export type Dispatcher = {
+	useState: UseState;
 };

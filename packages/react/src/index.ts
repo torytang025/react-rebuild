@@ -1,5 +1,1 @@
-import { createElement } from "./jsx/ReactJSXElement";
-
-export default {
-	createElement,
-};
+export * from "./ReactClient";

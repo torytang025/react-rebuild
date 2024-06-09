@@ -4,8 +4,7 @@ import {
 	createTextInstance,
 	type Instance,
 } from "ReactFiberConfig";
-
-import { logger } from "@/shared";
+import { logger } from "shared/logger";
 
 import type { FiberNode } from "./ReactFiber";
 import type { Flags } from "./ReactFiberFlags";

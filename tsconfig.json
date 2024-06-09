@@ -16,24 +16,13 @@
 
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["packages/*/src"]
+			"@/*": ["packages/*/src"],
+			"shared/*": ["packages/shared/src/*"],
+			"react-reconciler/*": ["packages/react-reconciler/src/*"],
+			"react": ["packages/react/src"]
 		},
 
 		"types": ["vite/client"]
 	},
-	"include": ["packages/**/*", "vite.config.ts"],
-	"references": [
-		{
-			"path": "./packages/shared"
-		},
-		{
-			"path": "./packages/react"
-		},
-		{
-			"path": "./packages/react-reconciler"
-		},
-		{
-			"path": "./packages/react-dom"
-		}
-	]
+	"include": ["packages/**/*", "vite.config.ts"]
 }

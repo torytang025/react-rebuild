@@ -1,5 +1,8 @@
-import { createContainer, updateContainer } from "@/react-reconciler";
-import type { ReactElement } from "@/shared";
+import {
+	createContainer,
+	updateContainer,
+} from "react-reconciler/ReactFiberReconciler";
+import type { ReactElement } from "shared/ReactTypes";
 
 import type { Container } from "./ReactFiberConfigDOM";
 

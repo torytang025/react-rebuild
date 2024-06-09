@@ -1,4 +1,4 @@
-import { logger } from "@/shared";
+import { logger } from "shared/logger";
 
 import { mountChildFibers, reconcileChildFibers } from "./ReactChildFiber";
 import type { FiberNode } from "./ReactFiber";

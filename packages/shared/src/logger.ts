@@ -28,6 +28,14 @@ function info(message: string, ...args: any[]) {
 	}
 }
 
+function warn(message: string, ...args: any[]) {
+	console.warn(
+		`%c[Warn][Logger From React Rebuild]`,
+		"color: orange; font-weight: bold; background-color: lightgray; padding: 4px;",
+		`${message} ${processArgs(args)}`,
+	);
+}
+
 function error(message: string, ...args: any[]): never {
 	console.error(
 		`%c[Error][Logger From React Rebuild]`,
@@ -39,6 +47,7 @@ function error(message: string, ...args: any[]): never {
 
 const logger = {
 	info,
+	warn,
 	error,
 };
 

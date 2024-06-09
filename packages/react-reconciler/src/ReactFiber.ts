@@ -170,6 +170,10 @@ export class FiberNode<State = unknown> {
 	 * a collection of flags that represent the state of the subtree rooted at this fiber
 	 */
 	subtreeFlags: Flags;
+	/**
+	 * a collection of fibers that represent the children that were deleted from the tree during the current update
+	 */
+	deletions: Array<FiberNode> | null;
 
 	constructor(tag: WorkTag, pendingProps: Props, key: Key) {
 		this.key = key;
@@ -193,6 +197,7 @@ export class FiberNode<State = unknown> {
 
 		this.flags = NoFlags;
 		this.subtreeFlags = NoFlags;
+		this.deletions = null;
 	}
 }
 
@@ -214,10 +219,11 @@ export function createWorkInProgress(
 		current.alternate = workInProgress;
 	} else {
 		// This is the case when we're reusing the work-in-progress fiber.
-		// We need to reset it to its original state.
+		// We need to clear the effects of the current fiber and update the props.
 		workInProgress.pendingProps = pendingProps;
 		workInProgress.flags = NoFlags;
 		workInProgress.subtreeFlags = NoFlags;
+		workInProgress.deletions = null;
 	}
 
 	// Reset all the other fields of the work-in-progress fiber.

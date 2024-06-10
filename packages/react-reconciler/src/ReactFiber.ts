@@ -150,6 +150,16 @@ export class FiberNode<State = unknown> {
 	memorizedProps: Props | null;
 	/**
 	 * represents the internal state of a component
+	 * @example
+	 * ```plaintext
+	 * HostRoot:
+	   For the root fiber (HostRoot) of a React application, memorizedState is the element that is rendered in the root container.
+	   Example: For a React app rendered with ReactDOM.createRoot(document.getElementById('root')).render(<App />), the memorizedState of the HostRoot fiber will be the <App /> element.
+	   
+		 FunctionComponent:
+	   For function components, memorizedState is the first hook in the linked list of hooks that store the component's state.
+
+		 ```
 	 */
 	memorizedState: State | null;
 	/**

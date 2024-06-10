@@ -95,6 +95,12 @@ function commitDeletionEffectsOnFiber(
 	nearestMountedAncestor: FiberNode,
 	deletedFiber: FiberNode,
 ): void {
+	logger.info(
+		"commitDeletionEffectsOnFiber",
+		deletedFiber.tag,
+		deletedFiber.type,
+	);
+
 	switch (deletedFiber.tag) {
 		case HostComponent:
 		case HostText: {
@@ -180,6 +186,12 @@ function commitMutationEffectsOnFiber(
 	root: FiberRootNode,
 	finishedWork: FiberNode,
 ) {
+	logger.info(
+		"commitMutationEffectsOnFiber",
+		finishedWork.tag,
+		finishedWork.type,
+	);
+
 	const current = finishedWork.alternate;
 	const flags = finishedWork.flags;
 

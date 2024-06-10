@@ -26,4 +26,27 @@ declare module "ReactFiberConfig" {
 		container: Container,
 		child: Instance | TextInstance,
 	): void;
+
+	function commitTextUpdate(
+		textInstance: TextInstance,
+		oldText: string,
+		newText: string,
+	): void;
+
+	function commitUpdate(
+		domElement: Instance,
+		type: string,
+		oldProps: Props,
+		newProps: Props,
+	): void;
+
+	function removeChild(
+		parentInstance: Instance,
+		child: Instance | TextInstance,
+	): void;
+
+	function removeChildFromContainer(
+		container: Container,
+		child: Instance | TextInstance,
+	): void;
 }

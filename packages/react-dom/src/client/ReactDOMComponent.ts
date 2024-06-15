@@ -1,11 +1,17 @@
 import { hasOwnProperty } from "shared/hasOwnProperty";
+import { logger } from "shared/logger";
 import type { Props } from "shared/ReactTypes";
 
+import { registrationNameDependencies } from "../events/EventRegistry";
 import {
 	setValueForAttribute,
 	setValueForStyles,
 } from "./DOMPropertyOperations";
 import type { CSSProperties } from "./ReactDOMTypes";
+import type { Instance, TextInstance } from "./ReactFiberConfigDOM";
+
+const randomKey = Math.random().toString(36).slice(2);
+const internalPropsKey = "__reactProps$" + randomKey;
 
 function setProp(
 	domElement: Element,
@@ -17,6 +23,8 @@ function setProp(
 ): void {
 	// Since this is a simplified example, we wouldn't implement all properties here
 	switch (key) {
+		case "children":
+			break;
 		case "className":
 			setValueForAttribute(domElement, "class", value as string);
 			break;
@@ -28,7 +36,21 @@ function setProp(
 			);
 			break;
 		default: {
-			setValueForAttribute(domElement, key, value as string);
+			if (
+				key.length > 2 &&
+				(key[0] === "o" || key[0] === "O") &&
+				(key[1] === "n" || key[1] === "N")
+			) {
+				if (
+					hasOwnProperty(registrationNameDependencies, key) &&
+					value != null &&
+					typeof value !== "function"
+				) {
+					logger.error("Event handler is not a function");
+				}
+			} else {
+				setValueForAttribute(domElement, key, value as string);
+			}
 		}
 	}
 }
@@ -71,4 +93,17 @@ export function updateProperties(
 			setProp(domElement, tag, propKey, nextProp, nextProps, lastProp);
 		}
 	}
+}
+
+export function updateFiberProps(
+	node: Instance | TextInstance,
+	props: Props,
+): void {
+	(node as any)[internalPropsKey] = props;
+}
+
+export function getFiberCurrentPropsFromNode(
+	node: Instance | TextInstance,
+): Props {
+	return (node as any)[internalPropsKey] || null;
 }

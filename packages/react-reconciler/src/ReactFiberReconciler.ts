@@ -1,5 +1,9 @@
 import { type Container } from "ReactFiberConfig";
-import type { ReactElement, UpdateQueue } from "shared/ReactTypes";
+import type {
+	ReactElement,
+	ReactNodeList,
+	UpdateQueue,
+} from "shared/ReactTypes";
 
 import { FiberNode } from "./ReactFiber";
 import { FiberRootNode } from "./ReactFiberRoot";
@@ -25,16 +29,10 @@ export function createContainer(containerInfo: Container) {
 /**
  * updateContainer is called by ReactDOM.createRoot().render() to update the FiberRootNode.
  */
-export function updateContainer(
-	element: ReactElement | null,
-	root: FiberRootNode,
-) {
+export function updateContainer(element: ReactNodeList, root: FiberRootNode) {
 	const hostRoot = root.current;
 	const update = createUpdate(element);
-	enqueueUpdate(
-		hostRoot.updateQueue as UpdateQueue<ReactElement | null>,
-		update,
-	);
+	enqueueUpdate(hostRoot.updateQueue as UpdateQueue<ReactNodeList>, update);
 	scheduleUpdateOnFiber(hostRoot);
 	return element;
 }

@@ -1,16 +1,15 @@
 import type { Props } from "shared/ReactTypes";
 
 import { COMMENT_NODE } from "./HTMLNodeType";
-import { updateProperties } from "./ReactDOMComponent";
+import { updateFiberProps, updateProperties } from "./ReactDOMComponent";
 
 export type Container = Element;
 export type Instance = Element;
 export type TextInstance = Text;
 
 export function createInstance(type: string, props: Props): Instance {
-	// TODO process props
-	console.log("createInstance", type, props);
 	const element = document.createElement(type);
+	updateFiberProps(element, props);
 	return element;
 }
 
@@ -54,6 +53,8 @@ export function commitUpdate(
 	newProps: Props,
 ): void {
 	updateProperties(domElement, type, oldProps, newProps);
+
+	updateFiberProps(domElement, newProps);
 }
 
 export function removeChild(

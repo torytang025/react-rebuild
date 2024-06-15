@@ -61,6 +61,7 @@ function updateHostRoot(
 	// This is null for the first render pass.
 	const baseSate = workInProgress.memorizedState;
 	const updateQueue = workInProgress.updateQueue!;
+	// fot host root, the pending update is the element to render
 	const pending = updateQueue.shared.pending;
 
 	const { memorizedState } = processUpdateQueue(baseSate, pending);
@@ -128,6 +129,12 @@ function reconcileChildren(
 	// If this is a new component that has never been rendered before, there is no current fiber.
 	// For minimal side-effects, we only create child fibers but do not tag them with the Placement tag.
 	// These children will be placed with the return fiber's Placement tag.
+	// Example:
+	// <div> <-- only the div has the Placement tag, whose flag is equal to 1
+	//	 <span>
+	//		 Hello
+	//  </span>
+	//</div>
 	if (current === null) {
 		workInProgress.child = mountChildFibers(workInProgress, null, nextChildren);
 	} else {

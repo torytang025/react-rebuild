@@ -12,6 +12,12 @@ declare module "ReactFiberConfig" {
 
 	function createTextInstance(text: string): Instance;
 
+	export function finalizeInitialChildren(
+		domElement: Instance,
+		type: string,
+		props: Props,
+	): boolean;
+
 	function appendInitialChild(
 		parentInstance: Instance,
 		child: Instance | TextInstance,

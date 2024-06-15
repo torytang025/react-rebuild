@@ -2,7 +2,11 @@ import { useState } from "react";
 
 function SubChild() {
 	return (
-		<div>
+		<div
+			style={{
+				background: "red",
+			}}
+		>
 			<p>
 				<span>Sub Child</span>
 			</p>
@@ -18,6 +22,7 @@ function App() {
 	const [num, setNum] = useState(0);
 	return (
 		<div
+			id="app"
 			onClick={() => {
 				console.log(
 					"%c [ onClickCapture ]-22-「App.tsx」",
@@ -35,6 +40,7 @@ function App() {
 				}}
 			>
 				{num % 2 === 0 ? <Child /> : <div>{num}</div>}
+				{/* <div>{num}</div> */}
 			</div>
 		</div>
 	);

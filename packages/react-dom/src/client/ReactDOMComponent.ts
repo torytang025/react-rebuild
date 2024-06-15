@@ -55,6 +55,38 @@ function setProp(
 	}
 }
 
+/**
+ * This is used to set initial properties on the DOM element.
+ */
+export function setInitialProperties(
+	domElement: Element,
+	tag: string,
+	props: Props,
+): void {
+	// Since this is a simplified example, we wouldn't list all tag here
+	// For the sake of the example, we only list div and span
+	switch (tag) {
+		case "div":
+		case "span":
+			break;
+	}
+
+	for (const propKey in props) {
+		if (!hasOwnProperty(props, propKey)) {
+			continue;
+		}
+		const propsValue = props[propKey];
+		if (propKey === null) {
+			continue;
+		} else {
+			setProp(domElement, tag, propKey, propsValue, props, null);
+		}
+	}
+}
+
+/**
+ * This is used to update the DOM element with new properties.
+ */
 export function updateProperties(
 	domElement: Element,
 	tag: string,
@@ -73,7 +105,7 @@ export function updateProperties(
 	for (const propKey in lastProps) {
 		const lastProp = lastProps[propKey];
 		if (
-			hasOwnProperty(nextProps, propKey) &&
+			hasOwnProperty(lastProps, propKey) &&
 			lastProp != null &&
 			!hasOwnProperty(nextProps, propKey)
 		) {

@@ -2,6 +2,7 @@ import {
 	appendInitialChild,
 	createInstance,
 	createTextInstance,
+	finalizeInitialChildren,
 	type Instance,
 } from "ReactFiberConfig";
 import { logger } from "shared/logger";
@@ -118,6 +119,9 @@ export function completeWork(
 				const instance = createInstance(type, newProps);
 				appendAllChildren(instance, workInProgress);
 				workInProgress.stateNode = instance;
+				if (finalizeInitialChildren(instance, type, newProps)) {
+					markUpdate(workInProgress);
+				}
 			}
 			bubbleProperties(workInProgress);
 			return null;

@@ -25,6 +25,23 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 		}
 	}
 
+	function deleteRemainingChildren(
+		returnFiber: FiberNode,
+		currentFirstChild: FiberNode | null,
+	): null {
+		if (!shouldTrackSideEffects) {
+			return null;
+		}
+
+		let childToDelete = currentFirstChild;
+		while (childToDelete !== null) {
+			deleteChild(returnFiber, childToDelete);
+			childToDelete = childToDelete.sibling;
+		}
+
+		return null;
+	}
+
 	function useFiber(fiber: FiberNode, pendingProps: Props): FiberNode {
 		const clone = createWorkInProgress(fiber, pendingProps);
 		clone.index = 0;
@@ -40,51 +57,88 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 		return newFiber;
 	}
 
+	/**
+	 * Deals with a single child, either reuse or new.
+	 * @example
+	 * ``` tsx
+	 * <div key="foo" /> <div key="bar" /> -> <div key="foo" />
+	 * <div key="foo" /> <div key="bar" /> -> <span key="foo" />
+	 * <div key="foo" />  -> <span key="foo" />
+	 * ```
+	 */
 	function reconcileSingleElement(
 		returnFiber: FiberNode,
 		currentFirstChild: FiberNode | null,
 		element: ReactElement,
 	): FiberNode {
 		const key = element.key;
-		const child = currentFirstChild;
-		if (child !== null) {
+		let child = currentFirstChild;
+		while (child !== null) {
 			if (child.key === key) {
 				const elementType = element.type;
 				if (child.type === elementType) {
+					// key and type match, which means the fiber can be reused and all the other children can be deleted
+					// For example: <div key="foo" /> <div key="bar" /> -> <div key="foo" />
+
+					// First, delete the remaining children
+					deleteRemainingChildren(returnFiber, child.sibling);
+
+					// Then, reuse the existing fiber
+					// For example: <div key="foo" /> -> <div key="foo" />
 					const existing = useFiber(child, element.props);
 					existing.return = returnFiber;
+
 					return existing;
 				}
-				deleteChild(returnFiber, child);
+
+				// key matches but the type doesn't, which means all the children need to be deleted
+				// For example: <div key="foo" /> <div key="bar" /> -> <span key="foo" />
+				deleteRemainingChildren(returnFiber, child);
+				// After deleting the remaining children, break the loop since all the children have been deleted
+				break;
 			} else {
+				// key doesn't match, delete the old child and continue to the next child
 				deleteChild(returnFiber, child);
 			}
+			child = child.sibling;
 		}
 
-		const fiber = createFiberFromElement(element);
-		fiber.return = returnFiber;
+		// If fallback to this point, it means the element is new and needs to be created
+		const newFiber = createFiberFromElement(element);
+		newFiber.return = returnFiber;
 
-		return fiber;
+		return newFiber;
 	}
 
+	/**
+	 * Deals with a single text node, either reuse or new.
+	 * @example
+	 * ``` tsx
+	 * <div>foo</div> -> <div>foo</div>
+	 * <div>foo</div> -> <div>bar</div>
+	 * <div><span /></div> -> <div>foo</div>
+	 */
 	function reconcileSingleTextNode(
 		returnFiber: FiberNode,
 		currentFirstChild: FiberNode | null,
 		content: string,
 	): FiberNode {
-		if (currentFirstChild !== null) {
-			if (currentFirstChild.tag === HostText) {
-				const existing = useFiber(currentFirstChild, content);
-				existing.return = returnFiber;
-				return existing;
-			}
-			deleteChild(returnFiber, currentFirstChild);
+		// Since there is no key for text nodes, we only need to check if the current child is a text node
+		if (currentFirstChild !== null && currentFirstChild.tag === HostText) {
+			// Same as the case for elements, if the current child is a text node, reuse it and delete the remaining children
+			deleteRemainingChildren(returnFiber, currentFirstChild.sibling);
+			const existing = useFiber(currentFirstChild, content);
+			existing.return = returnFiber;
+			return existing;
 		}
 
-		const fiber = createFiberFromText(content, null);
-		fiber.return = returnFiber;
+		// If fallback to this point, it means the current child is not a text node, so delete the current child and create a new text node
+		deleteRemainingChildren(returnFiber, currentFirstChild);
 
-		return fiber;
+		const newFiber = createFiberFromText(content, null);
+		newFiber.return = returnFiber;
+
+		return newFiber;
 	}
 
 	function reconcileChildFiber(

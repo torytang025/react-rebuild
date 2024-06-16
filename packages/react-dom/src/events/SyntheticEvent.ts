@@ -2,7 +2,6 @@ import type { FiberNode } from "react-reconciler/ReactFiber";
 import { hasOwnProperty } from "shared/hasOwnProperty";
 
 import type { AnyNativeEvent } from "./PluginModuleType";
-import type { ReactSyntheticEvent } from "./ReactSyntheticEventType";
 import type { BaseSyntheticEvent } from "./ReactSyntheticEventType";
 
 function functionThatReturnsTrue() {

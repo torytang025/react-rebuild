@@ -1,5 +1,1 @@
-export interface AnyNativeEvent
-	extends Event,
-		KeyboardEvent,
-		MouseEvent,
-		TouchEvent {}
+export type AnyNativeEvent = Event | KeyboardEvent | MouseEvent | TouchEvent;

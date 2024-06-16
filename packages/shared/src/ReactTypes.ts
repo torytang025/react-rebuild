@@ -5,8 +5,17 @@ export type Ref = { current: any } | ((instance: any) => void) | null;
 
 export type Component = any;
 
+export type ReactNode = ReactElement | ReactText;
+
+export type ReactEmpty = null | void | boolean;
+
+export type ReactNodeList = ReactEmpty | ReactNode;
+
+export type ReactText = string | number;
+
 export interface ReactElement {
 	/**
+	 * @internal
 	 * Annotation that marks the object as a React Element. We use this to determine if an object is a React Element.
 	 */
 	$$typeof: symbol | number;
@@ -23,14 +32,16 @@ export interface ReactElement {
 	 */
 	key: Key;
 	/**
-	 * The ref of the element.
+	 * @internal
+	 * The ref of the element. This won't be exposed to the user, instead it will be extracted from the props.
 	 */
 	ref: Ref;
 
 	/**
-	 * DEV only
+	 * @internal
+	 * Annotation that marks the object as a replica of React.
 	 */
-	__version: string;
+	__version: "react-rebuild";
 }
 
 export type CreateElement = (

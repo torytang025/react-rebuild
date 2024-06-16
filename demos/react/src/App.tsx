@@ -2,7 +2,11 @@ import { useState } from "react";
 
 function SubChild() {
 	return (
-		<div>
+		<div
+			style={{
+				background: "red",
+			}}
+		>
 			<p>
 				<span>Sub Child</span>
 			</p>
@@ -16,8 +20,30 @@ function Child() {
 
 function App() {
 	const [num, setNum] = useState(0);
-	window.setNum = setNum;
-	return num % 2 === 0 ? <Child /> : <div>{num}</div>;
+	return (
+		<div
+			id="app"
+			onClick={() => {
+				console.log(
+					"%c [ onClickCapture ]-22-「App.tsx」",
+					"font-size:13px; background:#FFFF00; color:#bf2c9f;",
+				);
+			}}
+			style={{
+				cursor: "pointer",
+			}}
+		>
+			<div
+				onClick={(e) => {
+					setNum((prev) => prev + 1);
+					// e.stopPropagation();
+				}}
+			>
+				{num % 2 === 0 ? <Child /> : <div>{num}</div>}
+				{/* <div>{num}</div> */}
+			</div>
+		</div>
+	);
 }
 
 export default App;

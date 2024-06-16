@@ -1,21 +1,43 @@
 import type { Props } from "shared/ReactTypes";
 
 import { COMMENT_NODE } from "./HTMLNodeType";
-import { updateProperties } from "./ReactDOMComponent";
+import {
+	setInitialProperties,
+	updateFiberProps,
+	updateProperties,
+} from "./ReactDOMComponent";
 
 export type Container = Element;
 export type Instance = Element;
 export type TextInstance = Text;
 
 export function createInstance(type: string, props: Props): Instance {
-	// TODO process props
-	console.log("createInstance", type, props);
 	const element = document.createElement(type);
+	updateFiberProps(element, props);
 	return element;
 }
 
 export function createTextInstance(text: string): TextInstance {
 	return document.createTextNode(text);
+}
+
+export function finalizeInitialChildren(
+	domElement: Instance,
+	type: string,
+	props: Props,
+): boolean {
+	setInitialProperties(domElement, type, props);
+	switch (type) {
+		case "button":
+		case "input":
+		case "select":
+		case "textarea":
+			return !!props.autoFocus;
+		case "img":
+			return true;
+		default:
+			return false;
+	}
 }
 
 export function appendInitialChild(
@@ -54,6 +76,8 @@ export function commitUpdate(
 	newProps: Props,
 ): void {
 	updateProperties(domElement, type, oldProps, newProps);
+
+	updateFiberProps(domElement, newProps);
 }
 
 export function removeChild(

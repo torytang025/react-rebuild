@@ -2,16 +2,42 @@ import {
 	createContainer,
 	updateContainer,
 } from "react-reconciler/ReactFiberReconciler";
-import type { ReactElement } from "shared/ReactTypes";
+import type { FiberRootNode } from "react-reconciler/ReactFiberRoot";
+import { logger } from "shared/logger";
+import type { ReactNodeList } from "shared/ReactTypes";
 
+import { listenToAllSupportedEvents } from "../events/DOMPluginEventSystem";
+import { COMMENT_NODE } from "./HTMLNodeType";
 import type { Container } from "./ReactFiberConfigDOM";
+
+class ReactDOMRoot {
+	_internalRoot: FiberRootNode;
+
+	constructor(internalRoot: FiberRootNode) {
+		this._internalRoot = internalRoot;
+	}
+
+	render(children: ReactNodeList) {
+		const root = this._internalRoot;
+		if (root === null) {
+			return logger.error("Cannot update an unmounted root.");
+		}
+		return updateContainer(children, root);
+	}
+}
 
 export function createRoot(container: Container) {
 	const root = createContainer(container);
+	const rootContainerElement =
+		container.nodeType === COMMENT_NODE ? container.parentNode : container;
 
-	return {
-		render(element: ReactElement) {
-			return updateContainer(element, root);
-		},
-	};
+	if (rootContainerElement === null) {
+		return logger.error(
+			"You are trying to render an element into a container that is not a DOM element.",
+		);
+	}
+
+	listenToAllSupportedEvents(rootContainerElement);
+
+	return new ReactDOMRoot(root);
 }

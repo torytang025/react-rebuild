@@ -1,6 +1,6 @@
 export type Type = any;
 export type Props = any;
-export type Key = any;
+export type Key = string | number | bigint | null | undefined;
 export type Ref = { current: any } | ((instance: any) => void) | null;
 
 export type Component = any;

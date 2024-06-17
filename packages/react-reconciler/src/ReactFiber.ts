@@ -279,8 +279,8 @@ export function createFiberFromElement(element: ReactElement): FiberNode {
 	return createFiberFromTypeAndProps(type, key, props);
 }
 
-export function createFiberFromText(content: string, key: Key): FiberNode {
-	const fiber = new FiberNode(HostText, content, key);
+export function createFiberFromText(content: string): FiberNode {
+	const fiber = new FiberNode(HostText, content, null);
 
 	return fiber;
 }

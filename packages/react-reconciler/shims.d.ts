@@ -8,7 +8,11 @@ declare module "ReactFiberConfig" {
 	type Instance = any;
 	type TextInstance = any;
 
-	function createInstance(type: string, props: any): Instance;
+	function createInstance(
+		type: string,
+		props: any,
+		internalInstanceHandle: FiberNode,
+	): Instance;
 
 	function createTextInstance(text: string): Instance;
 
@@ -31,6 +35,12 @@ declare module "ReactFiberConfig" {
 	function appendChildToContainer(
 		container: Container,
 		child: Instance | TextInstance,
+	): void;
+
+	export function insertBefore(
+		parentInstance: Instance,
+		child: Instance | TextInstance,
+		beforeChild: Instance | TextInstance,
 	): void;
 
 	function commitTextUpdate(

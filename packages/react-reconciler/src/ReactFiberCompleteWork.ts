@@ -60,6 +60,7 @@ function updateHostComponent(
 	newProps: Props,
 ) {
 	const oldProps = current.memorizedProps;
+	// TODO compare oldProps and newProps
 	if (oldProps === newProps) {
 		return;
 	}
@@ -116,7 +117,7 @@ export function completeWork(
 				updateHostComponent(current, workInProgress, type, newProps);
 			} else {
 				// create a new instance
-				const instance = createInstance(type, newProps);
+				const instance = createInstance(type, newProps, workInProgress);
 				appendAllChildren(instance, workInProgress);
 				workInProgress.stateNode = instance;
 				if (finalizeInitialChildren(instance, type, newProps)) {

@@ -2,6 +2,7 @@ import type { TextInstance } from "ReactFiberConfig";
 import {
 	commitTextUpdate,
 	commitUpdate,
+	insertBefore,
 	removeChild,
 	removeChildFromContainer,
 } from "ReactFiberConfig";
@@ -186,12 +187,6 @@ function commitMutationEffectsOnFiber(
 	root: FiberRootNode,
 	finishedWork: FiberNode,
 ) {
-	logger.info(
-		"commitMutationEffectsOnFiber",
-		finishedWork.tag,
-		finishedWork.type,
-	);
-
 	const current = finishedWork.alternate;
 	const flags = finishedWork.flags;
 
@@ -258,8 +253,6 @@ function commitReconciliationEffects(finishedWork: FiberNode) {
 	// And need to be fired after the children have been committed but before
 	// the the effects on this fiber are committed.
 	if (flags & Placement) {
-		logger.info("commitPlacement", finishedWork.type);
-
 		try {
 			commitPlacement(finishedWork);
 		} catch (err) {
@@ -276,6 +269,48 @@ function isHostParent(fiber: FiberNode) {
 
 function isHostNode(fiber: FiberNode) {
 	return fiber.tag === HostComponent || fiber.tag === HostText;
+}
+
+function getHostSibling(fiber: FiberNode): Instance | null {
+	let node: FiberNode = fiber;
+
+	// eslint-disable-next-line no-constant-condition
+	siblings: while (true) {
+		// If this node doesn't have a sibling, we need to traverse
+		// its parent to find a host parent.
+		while (node.sibling === null) {
+			if (node.return === null || isHostParent(node.return)) {
+				return null;
+			}
+			node = node.return;
+		}
+
+		node.sibling.return = node.return;
+		node = node.sibling;
+
+		// If this is not a host node, we need to traverse its children
+		// to find a host node.
+		while (!isHostNode(node)) {
+			// This node is not a stable host node, so we need to traverse
+			// its next sibling.
+			if (node.flags & Placement) {
+				continue siblings;
+			}
+
+			// We didn't find a host node till we reached
+			// the end of the sibling list.
+			if (node.child === null) {
+				continue siblings;
+			} else {
+				node.child.return = node;
+				node = node.child;
+			}
+		}
+
+		if (!(node.flags & Placement)) {
+			return node.stateNode;
+		}
+	}
 }
 
 /**
@@ -303,7 +338,8 @@ function commitPlacement(finishedWork: FiberNode) {
 	switch (parentFiber.tag) {
 		case HostComponent: {
 			const parent: Instance = parentFiber.stateNode;
-			insertOrAppendPlacementNode(finishedWork, parent);
+			const before = getHostSibling(finishedWork);
+			insertOrAppendPlacementNode(finishedWork, parent, before);
 			break;
 		}
 		case HostRoot: {
@@ -320,18 +356,26 @@ function commitPlacement(finishedWork: FiberNode) {
 /**
  * Insert or append a fiber node to the parent in the host environment.
  */
-function insertOrAppendPlacementNode(node: FiberNode, parent: Instance) {
+function insertOrAppendPlacementNode(
+	node: FiberNode,
+	parent: Instance,
+	before: Instance | null,
+) {
 	const isHost = isHostNode(node);
 	if (isHost) {
 		const stateNode = node.stateNode;
-		appendChild(parent, stateNode);
+		if (before) {
+			insertBefore(parent, stateNode, before);
+		} else {
+			appendChild(parent, stateNode);
+		}
 	} else {
 		const child = node.child;
 		if (child !== null) {
-			insertOrAppendPlacementNode(child, parent);
+			insertOrAppendPlacementNode(child, parent, before);
 			let sibling = child.sibling;
 			while (sibling !== null) {
-				insertOrAppendPlacementNode(sibling, parent);
+				insertOrAppendPlacementNode(sibling, parent, before);
 				sibling = sibling.sibling;
 			}
 		}

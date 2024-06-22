@@ -1,4 +1,4 @@
-import type { FiberNode } from "react-reconciler/ReactFiber";
+import type { Fiber } from "react-reconciler/ReactFiber";
 import { hasOwnProperty } from "shared/hasOwnProperty";
 import { logger } from "shared/logger";
 import type { Props } from "shared/ReactTypes";
@@ -16,7 +16,7 @@ const internalPropsKey = "__reactProps$" + randomKey;
 const internalInstanceKey = "__reactFiber$" + randomKey;
 
 export function precacheFiberNode(
-	hostInst: FiberNode,
+	hostInst: Fiber,
 	node: Instance | TextInstance,
 ): void {
 	(node as any)[internalInstanceKey] = hostInst;

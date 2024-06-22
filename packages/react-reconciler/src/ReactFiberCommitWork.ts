@@ -14,9 +14,9 @@ import {
 } from "ReactFiberConfig";
 import { logger } from "shared/logger";
 
-import type { FiberNode } from "./ReactFiber";
+import type { Fiber } from "./ReactFiber";
 import { MutationMask, Placement, Update } from "./ReactFiberFlags";
-import type { FiberRootNode } from "./ReactFiberRoot";
+import type { FiberRoot } from "./ReactFiberRoot";
 import {
 	FunctionComponent,
 	HostComponent,
@@ -24,14 +24,11 @@ import {
 	HostText,
 } from "./ReactWorkTag";
 
-export function commitMutationEffects(
-	root: FiberRootNode,
-	finishedWork: FiberNode,
-) {
+export function commitMutationEffects(root: FiberRoot, finishedWork: Fiber) {
 	commitMutationEffectsOnFiber(root, finishedWork);
 }
 
-function detachFiberMutation(fiber: FiberNode) {
+function detachFiberMutation(fiber: Fiber) {
 	const alternate = fiber.alternate;
 	if (alternate !== null) {
 		alternate.return = null;
@@ -48,11 +45,11 @@ let hostParentIsContainer: boolean = false;
  * Firstly, we need to find the nearest host parent of the deleted fiber.
  */
 function commitDeletionEffects(
-	root: FiberRootNode,
-	returnFiber: FiberNode,
-	deletedFiber: FiberNode,
+	root: FiberRoot,
+	returnFiber: Fiber,
+	deletedFiber: Fiber,
 ): void {
-	let parent: FiberNode | null = returnFiber;
+	let parent: Fiber | null = returnFiber;
 	findParent: while (parent !== null) {
 		switch (parent.tag) {
 			case HostRoot:
@@ -80,9 +77,9 @@ function commitDeletionEffects(
 }
 
 function recursivelyTraverseDeletionEffects(
-	finishedRoot: FiberRootNode,
-	nearestMountedAncestor: FiberNode,
-	parent: FiberNode,
+	finishedRoot: FiberRoot,
+	nearestMountedAncestor: Fiber,
+	parent: Fiber,
 ) {
 	let child = parent.child;
 	while (child !== null) {
@@ -92,9 +89,9 @@ function recursivelyTraverseDeletionEffects(
 }
 
 function commitDeletionEffectsOnFiber(
-	finishedRoot: FiberRootNode,
-	nearestMountedAncestor: FiberNode,
-	deletedFiber: FiberNode,
+	finishedRoot: FiberRoot,
+	nearestMountedAncestor: Fiber,
+	deletedFiber: Fiber,
 ): void {
 	logger.info(
 		"commitDeletionEffectsOnFiber",
@@ -160,8 +157,8 @@ function commitDeletionEffectsOnFiber(
 }
 
 function recursivelyTraverseMutationEffects(
-	root: FiberRootNode,
-	parentFiber: FiberNode,
+	root: FiberRoot,
+	parentFiber: Fiber,
 ) {
 	// Deletions Effects can be scheduled on any fiber type.
 	// And need to be fired before the effects on the children.
@@ -189,10 +186,7 @@ function recursivelyTraverseMutationEffects(
 /**
  * Commit the mutation effects on a fiber node to the host environment by traversing the fiber tree.
  */
-function commitMutationEffectsOnFiber(
-	root: FiberRootNode,
-	finishedWork: FiberNode,
-) {
+function commitMutationEffectsOnFiber(root: FiberRoot, finishedWork: Fiber) {
 	const current = finishedWork.alternate;
 	const flags = finishedWork.flags;
 
@@ -252,7 +246,7 @@ function commitMutationEffectsOnFiber(
 	}
 }
 
-function commitReconciliationEffects(finishedWork: FiberNode) {
+function commitReconciliationEffects(finishedWork: Fiber) {
 	const flags = finishedWork.flags;
 
 	// Placement can be scheduled on any fiber type.
@@ -269,16 +263,16 @@ function commitReconciliationEffects(finishedWork: FiberNode) {
 	}
 }
 
-function isHostParent(fiber: FiberNode) {
+function isHostParent(fiber: Fiber) {
 	return fiber.tag === HostComponent || fiber.tag === HostRoot;
 }
 
-function isHostNode(fiber: FiberNode) {
+function isHostNode(fiber: Fiber) {
 	return fiber.tag === HostComponent || fiber.tag === HostText;
 }
 
-function getHostSibling(fiber: FiberNode): Instance | null {
-	let node: FiberNode = fiber;
+function getHostSibling(fiber: Fiber): Instance | null {
+	let node: Fiber = fiber;
 
 	// eslint-disable-next-line no-constant-condition
 	siblings: while (true) {
@@ -322,7 +316,7 @@ function getHostSibling(fiber: FiberNode): Instance | null {
 /**
  * Get the host parent fiber of a fiber node.
  */
-function getHostParentFiber(fiber: FiberNode): FiberNode {
+function getHostParentFiber(fiber: Fiber): Fiber {
 	let parent = fiber.return;
 	while (parent !== null) {
 		if (isHostParent(parent)) {
@@ -338,7 +332,7 @@ function getHostParentFiber(fiber: FiberNode): FiberNode {
 /**
  * Commit the placement of a fiber node to the host environment.
  */
-function commitPlacement(finishedWork: FiberNode) {
+function commitPlacement(finishedWork: Fiber) {
 	const parentFiber = getHostParentFiber(finishedWork);
 
 	switch (parentFiber.tag) {
@@ -349,7 +343,7 @@ function commitPlacement(finishedWork: FiberNode) {
 			break;
 		}
 		case HostRoot: {
-			const parent: Container = (parentFiber.stateNode as FiberRootNode)
+			const parent: Container = (parentFiber.stateNode as FiberRoot)
 				.containerInfo;
 			insertOrAppendPlacementNodeIntoContainer(finishedWork, parent);
 			break;
@@ -363,7 +357,7 @@ function commitPlacement(finishedWork: FiberNode) {
  * Insert or append a fiber node to the parent in the host environment.
  */
 function insertOrAppendPlacementNode(
-	node: FiberNode,
+	node: Fiber,
 	parent: Instance,
 	before: Instance | null,
 ) {
@@ -392,7 +386,7 @@ function insertOrAppendPlacementNode(
  * Insert or append a fiber node to the container in the host environment.
  */
 function insertOrAppendPlacementNodeIntoContainer(
-	node: FiberNode,
+	node: Fiber,
 	parent: Container,
 ) {
 	const isHost = isHostNode(node);

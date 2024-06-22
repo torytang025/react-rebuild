@@ -8,7 +8,7 @@ import type {
 	SetStateReturn,
 } from "shared/ReactTypes";
 
-import type { FiberNode } from "./ReactFiber";
+import type { Fiber } from "./ReactFiber";
 import {
 	createUpdate,
 	createUpdateQueue,
@@ -24,13 +24,13 @@ type Hook<S = unknown, T = unknown> = {
 	next: Hook<T> | null;
 };
 
-let currentlyRenderingFiber: FiberNode<any> | null = null;
+let currentlyRenderingFiber: Fiber<any> | null = null;
 let currentHook: Hook<any, any> | null = null;
 let workInProgressHook: Hook<any, any> | null = null;
 
 export function renderWithHooks(
-	current: FiberNode | null,
-	workInProgress: FiberNode,
+	current: Fiber | null,
+	workInProgress: Fiber,
 	Component: Component,
 	props: Props,
 ) {
@@ -101,7 +101,7 @@ const mountState = <S>(initialState: InitialState<S>): SetStateReturn<S> => {
 	const queue = hook.queue!;
 	const dispatch: Dispatch<S> = dispatchSetState.bind<
 		null,
-		[FiberNode<S>, UpdateQueue<S>],
+		[Fiber<S>, UpdateQueue<S>],
 		[Action<S>],
 		void
 	>(null, currentlyRenderingFiber!, queue);
@@ -214,7 +214,7 @@ const updateState = <S>(): SetStateReturn<S> => {
 };
 
 const dispatchSetState = <S>(
-	fiber: FiberNode<S>,
+	fiber: Fiber<S>,
 	queue: UpdateQueue<S>,
 	action: Action<S>,
 ) => {

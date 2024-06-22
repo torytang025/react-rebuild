@@ -1,4 +1,4 @@
-import type { FiberNode } from "react-reconciler/ReactFiber";
+import type { Fiber } from "react-reconciler/ReactFiber";
 import type { Props } from "shared/ReactTypes";
 
 import { COMMENT_NODE } from "./HTMLNodeType";
@@ -16,7 +16,7 @@ export type TextInstance = Text;
 export function createInstance(
 	type: string,
 	props: Props,
-	internalInstanceHandle: FiberNode,
+	internalInstanceHandle: Fiber,
 ): Instance {
 	const element = document.createElement(type);
 	precacheFiberNode(internalInstanceHandle, element);

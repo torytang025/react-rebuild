@@ -1,6 +1,6 @@
 import type { Container } from "ReactFiberConfig";
 
-import type { FiberNode } from "./ReactFiber";
+import type { Fiber } from "./ReactFiber";
 
 /**
  * This is an internal structure in React Fiber that contains the information needed to manage the root of the React application.
@@ -29,12 +29,12 @@ import type { FiberNode } from "./ReactFiber";
  * ```
  */
 
-export class FiberRootNode {
+export class FiberRoot {
 	containerInfo: Container;
-	current: FiberNode;
-	finishedWork: FiberNode | null;
+	current: Fiber;
+	finishedWork: Fiber | null;
 
-	constructor(containerInfo: Container, hostRootFiber: FiberNode) {
+	constructor(containerInfo: Container, hostRootFiber: Fiber) {
 		this.containerInfo = containerInfo;
 		this.current = hostRootFiber;
 		hostRootFiber.stateNode = this;

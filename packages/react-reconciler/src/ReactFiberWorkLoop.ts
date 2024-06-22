@@ -1,24 +1,24 @@
 import { logger } from "shared/logger";
 
-import type { FiberNode } from "./ReactFiber";
+import type { Fiber } from "./ReactFiber";
 import { createWorkInProgress } from "./ReactFiber";
 import { beginWork } from "./ReactFiberBeginWork";
 import { commitMutationEffects } from "./ReactFiberCommitWork";
 import { completeWork } from "./ReactFiberCompleteWork";
 import { MutationMask, NoFlags } from "./ReactFiberFlags";
-import type { FiberRootNode } from "./ReactFiberRoot";
+import type { FiberRoot } from "./ReactFiberRoot";
 import { HostRoot } from "./ReactWorkTag";
 
-let workInProgress: FiberNode | null = null;
+let workInProgress: Fiber | null = null;
 
 /**
  * Prepares a fresh stack for the given root node, which is the entry point of the fiber tree.
  */
-function prepareFreshStack(root: FiberRootNode) {
+function prepareFreshStack(root: FiberRoot) {
 	workInProgress = createWorkInProgress(root.current, {});
 }
 
-export function scheduleUpdateOnFiber(fiber: FiberNode<any>) {
+export function scheduleUpdateOnFiber(fiber: Fiber<any>) {
 	const fiberRoot = markUpdateFromFiberToRoot(fiber);
 	renderRoot(fiberRoot);
 }
@@ -26,9 +26,9 @@ export function scheduleUpdateOnFiber(fiber: FiberNode<any>) {
 /**
  * Traverses the fiber tree from the given fiber node to the root node.
  */
-function markUpdateFromFiberToRoot(fiber: FiberNode) {
-	let node: FiberNode | null = fiber;
-	let parent: FiberNode | null = node.return;
+function markUpdateFromFiberToRoot(fiber: Fiber) {
+	let node: Fiber | null = fiber;
+	let parent: Fiber | null = node.return;
 	while (parent !== null) {
 		node = parent;
 		parent = node.return;
@@ -48,7 +48,7 @@ function markUpdateFromFiberToRoot(fiber: FiberNode) {
  * Begins the rendering process starting from the root node.
  * Prepares the fresh stack and enters the work loop.
  */
-function renderRoot(root: FiberRootNode) {
+function renderRoot(root: FiberRoot) {
 	prepareFreshStack(root);
 
 	do {
@@ -71,7 +71,7 @@ function renderRoot(root: FiberRootNode) {
 	commitRoot(root);
 }
 
-function commitRoot(root: FiberRootNode) {
+function commitRoot(root: FiberRoot) {
 	const finishedWork = root.current.alternate;
 
 	if (finishedWork === null) {
@@ -101,7 +101,7 @@ function workLoop() {
 	}
 }
 
-function performUnitOfWork(unitOfWork: FiberNode) {
+function performUnitOfWork(unitOfWork: Fiber) {
 	const current = unitOfWork.alternate;
 	const next = beginWork(current, unitOfWork);
 	unitOfWork.memorizedProps = unitOfWork.pendingProps;
@@ -113,8 +113,8 @@ function performUnitOfWork(unitOfWork: FiberNode) {
 	}
 }
 
-function completeUnitOfWork(unitOfWork: FiberNode) {
-	let completedWork: FiberNode | null = unitOfWork;
+function completeUnitOfWork(unitOfWork: Fiber) {
+	let completedWork: Fiber | null = unitOfWork;
 
 	do {
 		const current = completedWork.alternate;

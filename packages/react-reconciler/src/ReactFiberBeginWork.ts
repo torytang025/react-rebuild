@@ -1,7 +1,7 @@
 import { logger } from "shared/logger";
 
 import { mountChildFibers, reconcileChildFibers } from "./ReactChildFiber";
-import type { FiberNode } from "./ReactFiber";
+import type { Fiber } from "./ReactFiber";
 import { renderWithHooks } from "./ReactFiberHooks";
 import { processUpdateQueue } from "./ReactFiberUpdateQueue";
 import {
@@ -18,18 +18,12 @@ import {
  * 1. compute the next state of the fiber node
  * 2. create child fibers for the fiber node
  */
-export function beginWork(
-	current: FiberNode | null,
-	workInProgress: FiberNode,
-) {
+export function beginWork(current: Fiber | null, workInProgress: Fiber) {
 	logger.info("beginWork", workInProgress.tag, workInProgress.type);
 
 	switch (workInProgress.tag) {
 		case HostRoot:
-			return updateHostRoot(
-				current,
-				workInProgress as FiberNode<Element | null>,
-			);
+			return updateHostRoot(current, workInProgress as Fiber<Element | null>);
 		case FunctionComponent:
 			return updateFunctionComponent(current, workInProgress);
 		case HostComponent:
@@ -55,8 +49,8 @@ export function beginWork(
  * which is the element passed to ReactDOM.createRoot().render().
  */
 function updateHostRoot(
-	current: FiberNode | null,
-	workInProgress: FiberNode<Element | null>,
+	current: Fiber | null,
+	workInProgress: Fiber<Element | null>,
 ) {
 	// This is null for the first render pass.
 	const baseSate = workInProgress.memorizedState;
@@ -79,10 +73,7 @@ function updateHostRoot(
  * Update the state of a function component fiber node.
  * The pending props of a function component fiber node is the props passed to the component.
  */
-function updateFunctionComponent(
-	current: FiberNode | null,
-	workInProgress: FiberNode,
-) {
+function updateFunctionComponent(current: Fiber | null, workInProgress: Fiber) {
 	const Component = workInProgress.type;
 	const pendingProps = workInProgress.pendingProps;
 	const nextChildren = renderWithHooks(
@@ -100,7 +91,7 @@ function updateFunctionComponent(
  * Update the state of a fragment fiber node.
  * The pending props of a fragment fiber node is the children of the fragment.
  */
-function updateFragment(current: FiberNode | null, workInProgress: FiberNode) {
+function updateFragment(current: Fiber | null, workInProgress: Fiber) {
 	const nextChildren = workInProgress.pendingProps;
 	reconcileChildren(current, workInProgress, nextChildren);
 	return workInProgress.child;
@@ -114,10 +105,7 @@ function updateFragment(current: FiberNode | null, workInProgress: FiberNode) {
  * which is the props passed to the component in the render method, e.g. <div className="foo" />.
  *
  */
-function updateHostComponent(
-	current: FiberNode | null,
-	workInProgress: FiberNode,
-) {
+function updateHostComponent(current: Fiber | null, workInProgress: Fiber) {
 	const nextProps = workInProgress.pendingProps;
 	const nextChildren = nextProps.children;
 	reconcileChildren(current, workInProgress, nextChildren);
@@ -136,8 +124,8 @@ function updateHostText() {
 }
 
 function reconcileChildren(
-	current: FiberNode | null,
-	workInProgress: FiberNode<any>,
+	current: Fiber | null,
+	workInProgress: Fiber<any>,
 	nextChildren: any,
 ) {
 	// If this is a new component that has never been rendered before, there is no current fiber.

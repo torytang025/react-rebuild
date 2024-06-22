@@ -63,7 +63,7 @@ import {
   ```
  */
 // TODO finish the generic type
-export class FiberNode<State = unknown> {
+export class Fiber<State = unknown> {
 	/**
 	 * the unique identifier for this fiber
 	 */
@@ -128,15 +128,15 @@ export class FiberNode<State = unknown> {
 	/**
 	 * points to the parent fiber
 	 */
-	return: FiberNode | null;
+	return: Fiber | null;
 	/**
 	 * points to the first child fiber
 	 */
-	child: FiberNode | null;
+	child: Fiber | null;
 	/**
 	 * points to the next fiber in the list of siblings
 	 */
-	sibling: FiberNode | null;
+	sibling: Fiber | null;
 	/**
 	 * the index of this fiber in the list of siblings
 	 */
@@ -175,7 +175,7 @@ export class FiberNode<State = unknown> {
 	 * links a fiber to its previous version (work-in-progress -> current), enabling efficient reconciliation between renders.
 	 * only exists during the process of generating a new fiber node tree.
 	 */
-	alternate: FiberNode | null;
+	alternate: Fiber | null;
 	/**
 	 * a collection of flags that represent the current state of the fiber
 	 */
@@ -187,7 +187,7 @@ export class FiberNode<State = unknown> {
 	/**
 	 * a collection of fibers that represent the children that were deleted from the tree during the current update
 	 */
-	deletions: Array<FiberNode> | null;
+	deletions: Array<Fiber> | null;
 
 	constructor(tag: WorkTag, pendingProps: Props, key: Key) {
 		this.key = key;
@@ -219,15 +219,15 @@ export class FiberNode<State = unknown> {
  * Creates a new work-in-progress fiber node from the current fiber node.
  */
 export function createWorkInProgress(
-	current: FiberNode,
+	current: Fiber,
 	pendingProps: Props,
-): FiberNode {
+): Fiber {
 	let workInProgress = current.alternate;
 
 	// This is the case on the first render pass, when the current fiber is the work-in-progress fiber.
 	// In this case, we need to create a new work-in-progress fiber.
 	if (workInProgress === null) {
-		workInProgress = new FiberNode(current.tag, pendingProps, current.key);
+		workInProgress = new Fiber(current.tag, pendingProps, current.key);
 		workInProgress.stateNode = current.stateNode;
 		workInProgress.alternate = current;
 		current.alternate = workInProgress;
@@ -281,13 +281,13 @@ function createFiberFromTypeAndProps(
 		}
 	}
 
-	const fiber = new FiberNode(fiberTag, pendingProps, key);
+	const fiber = new Fiber(fiberTag, pendingProps, key);
 	fiber.type = type;
 
 	return fiber;
 }
 
-export function createFiberFromElement(element: ReactElement): FiberNode {
+export function createFiberFromElement(element: ReactElement): Fiber {
 	const { key, props, type } = element;
 	return createFiberFromTypeAndProps(type, key, props);
 }
@@ -300,12 +300,12 @@ export function createFiberFromElement(element: ReactElement): FiberNode {
 export function createFiberFromFragment(
 	elements: ReactFragment,
 	key: Key,
-): FiberNode {
-	return new FiberNode(Fragment, elements, key);
+): Fiber {
+	return new Fiber(Fragment, elements, key);
 }
 
-export function createFiberFromText(content: string): FiberNode {
-	const fiber = new FiberNode(HostText, content, null);
+export function createFiberFromText(content: string): Fiber {
+	const fiber = new Fiber(HostText, content, null);
 
 	return fiber;
 }

@@ -1,48 +1,31 @@
 import { useState } from "react";
 
-function SubChild() {
-	return (
-		<div
-			style={{
-				background: "red",
-			}}
-		>
-			<p>
-				<span>Sub Child</span>
-			</p>
-		</div>
-	);
-}
-
-function Child() {
-	return <SubChild />;
-}
-
 function App() {
 	const [num, setNum] = useState(0);
+	const arr =
+		num % 2 === 0
+			? [<li key={1}>1</li>, <li key={2}>2</li>, <li key={3}>3</li>]
+			: [<li key={3}>3</li>, <li key={2}>2</li>, <li key={1}>1</li>];
 	return (
-		<div
-			id="app"
-			onClick={() => {
-				console.log(
-					"%c [ onClickCapture ]-22-「App.tsx」",
-					"font-size:13px; background:#FFFF00; color:#bf2c9f;",
-				);
-			}}
-			style={{
-				cursor: "pointer",
+		// <ul
+		// 	onClick={(e) => {
+		// 		setNum((prev) => prev + 1);
+		// 		e.stopPropagation();
+		// 	}}
+		// >
+		// 	{arr}
+		// </ul>
+		<ul
+			onClick={(e) => {
+				setNum((prev) => prev + 1);
+				e.stopPropagation();
 			}}
 		>
-			<div
-				onClick={(e) => {
-					setNum((prev) => prev + 1);
-					// e.stopPropagation();
-				}}
-			>
-				{num % 2 === 0 ? <Child /> : <div>{num}</div>}
-				{/* <div>{num}</div> */}
-			</div>
-		</div>
+			<li>a</li>
+			<li>b</li>
+			{arr}
+			{num % 2 === 0 ? <>{arr}</> : null}
+		</ul>
 	);
 }
 

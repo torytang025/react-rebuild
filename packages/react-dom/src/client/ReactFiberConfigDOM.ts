@@ -1,7 +1,9 @@
+import type { FiberNode } from "react-reconciler/ReactFiber";
 import type { Props } from "shared/ReactTypes";
 
 import { COMMENT_NODE } from "./HTMLNodeType";
 import {
+	precacheFiberNode,
 	setInitialProperties,
 	updateFiberProps,
 	updateProperties,
@@ -11,8 +13,13 @@ export type Container = Element;
 export type Instance = Element;
 export type TextInstance = Text;
 
-export function createInstance(type: string, props: Props): Instance {
+export function createInstance(
+	type: string,
+	props: Props,
+	internalInstanceHandle: FiberNode,
+): Instance {
 	const element = document.createElement(type);
+	precacheFiberNode(internalInstanceHandle, element);
 	updateFiberProps(element, props);
 	return element;
 }
@@ -59,6 +66,14 @@ export function appendChildToContainer(
 	child: Instance | TextInstance,
 ): void {
 	container.appendChild(child);
+}
+
+export function insertBefore(
+	parentInstance: Instance,
+	child: Instance | TextInstance,
+	beforeChild: Instance | TextInstance,
+): void {
+	parentInstance.insertBefore(child, beforeChild);
 }
 
 export function commitTextUpdate(

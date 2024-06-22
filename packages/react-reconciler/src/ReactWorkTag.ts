@@ -2,7 +2,8 @@ export type WorkTag =
 	| typeof FunctionComponent
 	| typeof HostRoot
 	| typeof HostComponent
-	| typeof HostText;
+	| typeof HostText
+	| typeof Fragment;
 
 /**
  * @example const MyComponent = () => <div>hello</div>;
@@ -26,3 +27,9 @@ export const HostComponent = 5;
  * @example "hello" inside this element <h1>hello</h1>
  */
 export const HostText = 6;
+
+/**
+ * Represents a React fragment.
+ * @example <React.Fragment>hello</React.Fragment> or <>hello</>
+ */
+export const Fragment = 7;

@@ -1,16 +1,21 @@
 export type Type = any;
 export type Props = any;
-export type Key = any;
+export type Key = string | number | bigint | null | undefined;
 export type Ref = { current: any } | ((instance: any) => void) | null;
 
 export type Component = any;
 
-export type ReactNode = ReactElement | ReactText;
+export type ReactNode =
+	| ReactElement
+	| ReactText
+	| Iterable<ReactNode>
+	| boolean
+	| null
+	| undefined;
 
 export type ReactEmpty = null | void | boolean;
-
+export type ReactFragment = ReactEmpty | Iterable<ReactNode>;
 export type ReactNodeList = ReactEmpty | ReactNode;
-
 export type ReactText = string | number;
 
 export interface ReactElement {
@@ -18,9 +23,9 @@ export interface ReactElement {
 	 * @internal
 	 * Annotation that marks the object as a React Element. We use this to determine if an object is a React Element.
 	 */
-	$$typeof: symbol | number;
+	$$typeof: symbol;
 	/**
-	 * The type of the element. This can be a string (for built-in components) or a class/function (for composite components).
+	 * The type of the element. This can be a string (for built-in components) or a class/function (for composite components) or a symbol (for fragments).
 	 */
 	type: Type;
 	/**

@@ -12,6 +12,7 @@ import type { FiberNode } from "./ReactFiber";
 import type { Flags } from "./ReactFiberFlags";
 import { NoFlags, Update } from "./ReactFiberFlags";
 import {
+	Fragment,
 	FunctionComponent,
 	HostComponent,
 	HostRoot,
@@ -60,6 +61,7 @@ function updateHostComponent(
 	newProps: Props,
 ) {
 	const oldProps = current.memorizedProps;
+	// TODO compare oldProps and newProps
 	if (oldProps === newProps) {
 		return;
 	}
@@ -108,6 +110,7 @@ export function completeWork(
 	switch (tag) {
 		case HostRoot:
 		case FunctionComponent:
+		case Fragment:
 			bubbleProperties(workInProgress);
 			return null;
 		case HostComponent: {
@@ -116,7 +119,7 @@ export function completeWork(
 				updateHostComponent(current, workInProgress, type, newProps);
 			} else {
 				// create a new instance
-				const instance = createInstance(type, newProps);
+				const instance = createInstance(type, newProps, workInProgress);
 				appendAllChildren(instance, workInProgress);
 				workInProgress.stateNode = instance;
 				if (finalizeInitialChildren(instance, type, newProps)) {

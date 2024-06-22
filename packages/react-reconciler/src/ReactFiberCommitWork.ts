@@ -110,6 +110,12 @@ function commitDeletionEffectsOnFiber(
 
 			// Because we only need to delete the nearest host child, set host parent to null
 			// to make sure the nested host nodes are not deleted.
+			// Example:
+			// <div>  <--- Delete the nearest host child
+			//   <div>
+			//     <div />
+			//   </div>
+			// <div />
 			hostParent = null;
 
 			recursivelyTraverseDeletionEffects(

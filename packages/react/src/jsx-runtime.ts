@@ -1,1 +1,1 @@
-export { jsxProd } from "./jsx/ReactJSXElement";
+export { Fragment, jsx } from "./jsx/ReactJSX";

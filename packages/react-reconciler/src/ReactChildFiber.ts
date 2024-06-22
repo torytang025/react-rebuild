@@ -1,15 +1,22 @@
+import isArray from "shared/isArray";
 import { logger } from "shared/logger";
-import { REACT_ELEMENT_TYPE } from "shared/ReactSymbols";
-import type { Props, ReactElement, ReactNode } from "shared/ReactTypes";
+import { REACT_ELEMENT_TYPE, REACT_FRAGMENT_TYPE } from "shared/ReactSymbols";
+import type {
+	Key,
+	Props,
+	ReactElement,
+	ReactFragment,
+} from "shared/ReactTypes";
 
 import type { FiberNode } from "./ReactFiber";
 import {
 	createFiberFromElement,
+	createFiberFromFragment,
 	createFiberFromText,
 	createWorkInProgress,
 } from "./ReactFiber";
 import { ChildDeletion, Placement } from "./ReactFiberFlags";
-import { HostText } from "./ReactWorkTag";
+import { Fragment, HostText } from "./ReactWorkTag";
 
 type ExistintChildrenMap = Map<string | number | bigint, FiberNode>;
 
@@ -157,6 +164,17 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 		element: ReactElement,
 	): FiberNode {
 		const elementType = element.type;
+
+		if (elementType === REACT_FRAGMENT_TYPE) {
+			const updated = updateFragment(
+				returnFiber,
+				current,
+				element.props.children as ReactFragment,
+				element.key,
+			);
+			return updated;
+		}
+
 		if (current !== null) {
 			if (current.type === elementType) {
 				// Update
@@ -171,9 +189,30 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 		return created;
 	}
 
+	function updateFragment(
+		returnFiber: FiberNode,
+		current: FiberNode | null,
+		fragment: ReactFragment,
+		key: Key,
+	): FiberNode {
+		if (current === null || current.tag !== Fragment) {
+			// Insert
+			const newFiber = createFiberFromFragment(fragment, key);
+			newFiber.return = returnFiber;
+
+			return newFiber;
+		} else {
+			// Update
+			const existing = useFiber(current, fragment);
+			existing.return = returnFiber;
+
+			return existing;
+		}
+	}
+
 	function createChild(
 		returnFiber: FiberNode,
-		newChild: ReactNode,
+		newChild: ReactElement,
 	): FiberNode | null {
 		if (
 			(typeof newChild === "string" && newChild !== "") ||
@@ -194,7 +233,14 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 				}
 			}
 
-			// TODO Handle array children
+			if (isArray(newChild)) {
+				// For an array of children, we need to create a fragment fiber
+				const newFiber = createFiberFromFragment(newChild, null);
+				newFiber.return = returnFiber;
+				return newFiber;
+			}
+
+			throwOnInvalidObjectType(returnFiber, newChild);
 		}
 
 		return null;
@@ -203,7 +249,7 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 	function updateSlot(
 		returnFiber: FiberNode,
 		oldFiber: FiberNode | null,
-		newChild: ReactNode,
+		newChild: ReactElement,
 	): FiberNode | null {
 		// if the key matches, we can reuse and update the oldFiber, otherwise return null
 		const key = oldFiber === null ? null : oldFiber.key;
@@ -231,7 +277,17 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 					}
 			}
 
-			// TODO Handle array children
+			if (isArray(newChild)) {
+				// Since array children don't have keys, if the oldFiber is not null and the key is null, return null
+				if (key !== null) {
+					return null;
+				}
+
+				const updated = updateFragment(returnFiber, oldFiber, newChild, null);
+				return updated;
+			}
+
+			throwOnInvalidObjectType(returnFiber, newChild);
 		}
 
 		return null;
@@ -241,7 +297,7 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 		existingChildren: ExistintChildrenMap,
 		returnFiber: FiberNode,
 		newIdx: number,
-		newChild: ReactNode,
+		newChild: ReactElement,
 	): FiberNode | null {
 		if (
 			(typeof newChild === "string" && newChild !== "") ||
@@ -267,7 +323,18 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 				}
 			}
 
-			// TODO Handle array children
+			if (isArray(newChild)) {
+				const matchedFiber = existingChildren.get(newIdx) || null;
+				const updated = updateFragment(
+					returnFiber,
+					matchedFiber,
+					newChild,
+					null,
+				);
+				return updated;
+			}
+
+			throwOnInvalidObjectType(returnFiber, newChild);
 		}
 
 		return null;
@@ -279,7 +346,7 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 	function reconcileChildrenArray(
 		returnFiber: FiberNode,
 		currentFirstChild: FiberNode | null,
-		newChildren: Array<ReactNode>,
+		newChildren: Array<ReactElement>,
 	) {
 		// Let's break down the reconciliation process into four steps:
 		// 1. Reconcile the children in the same order with the same key
@@ -443,7 +510,15 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 		while (child !== null) {
 			if (child.key === key) {
 				const elementType = element.type;
-				if (child.type === elementType) {
+				if (elementType === REACT_FRAGMENT_TYPE) {
+					deleteRemainingChildren(returnFiber, child.sibling);
+
+					// For fragments, the pending props is the children of the fragment
+					const existing = useFiber(child, element.props.children);
+					existing.return = returnFiber;
+
+					return existing;
+				} else if (child.type === elementType) {
 					// key and type match, which means the fiber can be reused and all the other children can be deleted
 					// For example: <div key="foo" /> <div key="bar" /> -> <div key="foo" />
 
@@ -457,7 +532,6 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 
 					return existing;
 				}
-
 				// key matches but the type doesn't, which means all the children need to be deleted
 				// For example: <div key="foo" /> <div key="bar" /> -> <span key="foo" />
 				deleteRemainingChildren(returnFiber, child);
@@ -468,6 +542,16 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 				deleteChild(returnFiber, child);
 			}
 			child = child.sibling;
+		}
+
+		if (element.type === REACT_FRAGMENT_TYPE) {
+			const newFiber = createFiberFromFragment(
+				element.props.children as ReactFragment,
+				element.key,
+			);
+			newFiber.return = returnFiber;
+
+			return newFiber;
 		}
 
 		// If fallback to this point, it means the element is new and needs to be created
@@ -511,8 +595,21 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 	function reconcileChildFibers(
 		returnFiber: FiberNode,
 		currentFirstChild: FiberNode | null,
-		nextChild: ReactNode,
+		nextChild: ReactElement,
 	) {
+		const isUnkeyedTopLevelFragment =
+			typeof nextChild === "object" &&
+			nextChild !== null &&
+			nextChild.type === REACT_FRAGMENT_TYPE &&
+			nextChild.key === null;
+
+		// If the top level fragment is unkeyed, we need to
+		// unwrap it and work on its children. For example:
+		// <div><><span /><span /></></div> -> <div /><span /><span /><div />
+		if (isUnkeyedTopLevelFragment) {
+			nextChild = nextChild.props.children;
+		}
+
 		if (typeof nextChild === "object" && nextChild !== null) {
 			switch (nextChild.$$typeof) {
 				case REACT_ELEMENT_TYPE:
@@ -521,7 +618,7 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 					);
 			}
 
-			if (Array.isArray(nextChild)) {
+			if (isArray(nextChild)) {
 				const firstNewChild = reconcileChildrenArray(
 					returnFiber,
 					currentFirstChild,

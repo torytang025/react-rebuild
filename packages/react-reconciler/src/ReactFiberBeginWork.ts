@@ -5,6 +5,7 @@ import type { FiberNode } from "./ReactFiber";
 import { renderWithHooks } from "./ReactFiberHooks";
 import { processUpdateQueue } from "./ReactFiberUpdateQueue";
 import {
+	Fragment,
 	FunctionComponent,
 	HostComponent,
 	HostRoot,
@@ -29,15 +30,14 @@ export function beginWork(
 				current,
 				workInProgress as FiberNode<Element | null>,
 			);
-
 		case FunctionComponent:
 			return updateFunctionComponent(current, workInProgress);
-
 		case HostComponent:
 			return updateHostComponent(current, workInProgress);
-
 		case HostText:
 			return updateHostText();
+		case Fragment:
+			return updateFragment(current, workInProgress);
 
 		default:
 			return logger.error(
@@ -75,6 +75,10 @@ function updateHostRoot(
 	return workInProgress.child;
 }
 
+/**
+ * Update the state of a function component fiber node.
+ * The pending props of a function component fiber node is the props passed to the component.
+ */
 function updateFunctionComponent(
 	current: FiberNode | null,
 	workInProgress: FiberNode,
@@ -89,6 +93,16 @@ function updateFunctionComponent(
 	);
 	reconcileChildren(current, workInProgress, nextChildren);
 
+	return workInProgress.child;
+}
+
+/**
+ * Update the state of a fragment fiber node.
+ * The pending props of a fragment fiber node is the children of the fragment.
+ */
+function updateFragment(current: FiberNode | null, workInProgress: FiberNode) {
+	const nextChildren = workInProgress.pendingProps;
+	reconcileChildren(current, workInProgress, nextChildren);
 	return workInProgress.child;
 }
 

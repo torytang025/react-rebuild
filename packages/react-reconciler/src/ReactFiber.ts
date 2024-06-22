@@ -1,8 +1,10 @@
 import { logger } from "shared/logger";
+import { REACT_FRAGMENT_TYPE } from "shared/ReactSymbols";
 import type {
 	Key,
 	Props,
 	ReactElement,
+	ReactFragment,
 	Ref,
 	Type,
 	UpdateQueue,
@@ -11,6 +13,7 @@ import type {
 import type { Flags } from "./ReactFiberFlags";
 import { NoFlags } from "./ReactFiberFlags";
 import {
+	Fragment,
 	FunctionComponent,
 	HostComponent,
 	HostText,
@@ -59,6 +62,7 @@ import {
         └── FiberNode (tag: HostText, type: null, stateNode: "Hello, world!")
   ```
  */
+// TODO finish the generic type
 export class FiberNode<State = unknown> {
 	/**
 	 * the unique identifier for this fiber
@@ -260,12 +264,21 @@ function createFiberFromTypeAndProps(
 		// When the type is a string, it represents a host component (e.g., div, span, etc.).
 		fiberTag = HostComponent;
 	} else {
-		const typeString = type === null ? "null" : typeof type;
+		switch (type) {
+			case REACT_FRAGMENT_TYPE:
+				return createFiberFromFragment(
+					pendingProps.children as ReactFragment,
+					key,
+				);
 
-		return logger.error(
-			"Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: ",
-			typeString,
-		);
+			default: {
+				const typeString = type === null ? "null" : typeof type;
+				return logger.error(
+					"Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: ",
+					typeString,
+				);
+			}
+		}
 	}
 
 	const fiber = new FiberNode(fiberTag, pendingProps, key);
@@ -277,6 +290,18 @@ function createFiberFromTypeAndProps(
 export function createFiberFromElement(element: ReactElement): FiberNode {
 	const { key, props, type } = element;
 	return createFiberFromTypeAndProps(type, key, props);
+}
+
+/**
+ * @param elements The children of the fragment
+ * @param key The key of the fragment
+ * @returns A new FiberNode representing a fragment
+ */
+export function createFiberFromFragment(
+	elements: ReactFragment,
+	key: Key,
+): FiberNode {
+	return new FiberNode(Fragment, elements, key);
 }
 
 export function createFiberFromText(content: string): FiberNode {

@@ -12,6 +12,7 @@ import type { FiberNode } from "./ReactFiber";
 import type { Flags } from "./ReactFiberFlags";
 import { NoFlags, Update } from "./ReactFiberFlags";
 import {
+	Fragment,
 	FunctionComponent,
 	HostComponent,
 	HostRoot,
@@ -109,6 +110,7 @@ export function completeWork(
 	switch (tag) {
 		case HostRoot:
 		case FunctionComponent:
+		case Fragment:
 			bubbleProperties(workInProgress);
 			return null;
 		case HostComponent: {

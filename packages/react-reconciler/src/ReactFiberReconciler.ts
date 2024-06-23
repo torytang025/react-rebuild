@@ -1,11 +1,8 @@
 import { type Container } from "ReactFiberConfig";
-import type {
-	ReactElement,
-	ReactNodeList,
-	UpdateQueue,
-} from "shared/ReactTypes";
+import type { ReactNodeList, UpdateQueue } from "shared/ReactTypes";
 
 import { Fiber } from "./ReactFiber";
+import { type Lane, requestUpdateLane } from "./ReactFiberLane";
 import { FiberRoot } from "./ReactFiberRoot";
 import {
 	createUpdate,
@@ -30,9 +27,21 @@ export function createContainer(containerInfo: Container) {
  * updateContainer is called by ReactDOM.createRoot().render() to update the FiberRootNode.
  */
 export function updateContainer(element: ReactNodeList, root: FiberRoot) {
+	const current = root.current;
+	const lane = requestUpdateLane(current);
+	updateContainerImpl(current, lane, element, root);
+	return lane;
+}
+
+function updateContainerImpl(
+	rootFiber: Fiber,
+	lane: Lane,
+	element: ReactNodeList,
+	root: FiberRoot,
+) {
 	const hostRoot = root.current;
-	const update = createUpdate(element);
+	const update = createUpdate(element, lane);
 	enqueueUpdate(hostRoot.updateQueue as UpdateQueue<ReactNodeList>, update);
-	scheduleUpdateOnFiber(hostRoot);
+	scheduleUpdateOnFiber(hostRoot, lane);
 	return element;
 }

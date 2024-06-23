@@ -1,6 +1,7 @@
 import type { Container } from "ReactFiberConfig";
 
 import type { Fiber } from "./ReactFiber";
+import { type Lanes, NoLanes } from "./ReactFiberLane";
 
 /**
  * This is an internal structure in React Fiber that contains the information needed to manage the root of the React application.
@@ -34,10 +35,16 @@ export class FiberRoot {
 	current: Fiber;
 	finishedWork: Fiber | null;
 
+	pendingLanes: Lanes;
+	finishedLanes: Lanes;
+
 	constructor(containerInfo: Container, hostRootFiber: Fiber) {
 		this.containerInfo = containerInfo;
 		this.current = hostRootFiber;
 		hostRootFiber.stateNode = this;
 		this.finishedWork = null;
+
+		this.pendingLanes = NoLanes;
+		this.finishedLanes = NoLanes;
 	}
 }

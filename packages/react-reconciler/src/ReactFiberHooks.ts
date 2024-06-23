@@ -9,6 +9,8 @@ import type {
 } from "shared/ReactTypes";
 
 import type { Fiber } from "./ReactFiber";
+import type { Lanes } from "./ReactFiberLane";
+import { NoLanes, requestUpdateLane } from "./ReactFiberLane";
 import {
 	createUpdate,
 	createUpdateQueue,
@@ -24,6 +26,8 @@ type Hook<S = unknown, T = unknown> = {
 	next: Hook<T> | null;
 };
 
+let renderLanes: Lanes = NoLanes;
+
 let currentlyRenderingFiber: Fiber<any> | null = null;
 let currentHook: Hook<any, any> | null = null;
 let workInProgressHook: Hook<any, any> | null = null;
@@ -33,7 +37,9 @@ export function renderWithHooks(
 	workInProgress: Fiber,
 	Component: Component,
 	props: Props,
+	nextRenderLanes: Lanes,
 ) {
+	renderLanes = nextRenderLanes;
 	currentlyRenderingFiber = workInProgress;
 	// Reset the memorizedState, where the hooks will be stored, to null
 	// to indicate that it's a new hook list
@@ -56,6 +62,7 @@ function finishRenderingHooks() {
 	currentlyRenderingFiber = null;
 	currentHook = null;
 	workInProgressHook = null;
+	renderLanes = NoLanes;
 }
 
 const mountWorkInProgressHook = <S>(): Hook<S> => {
@@ -203,7 +210,11 @@ const updateStateImpl = <S>(): SetStateReturn<S> => {
 	const pendingUpdate = queue.shared.pending;
 	const dispatch = queue.dispatch!;
 
-	const { memorizedState } = processUpdateQueue(baseSate, pendingUpdate);
+	const { memorizedState } = processUpdateQueue(
+		baseSate,
+		pendingUpdate,
+		renderLanes,
+	);
 	hook.memorizedState = memorizedState;
 
 	return [hook.memorizedState, dispatch];
@@ -218,9 +229,10 @@ const dispatchSetState = <S>(
 	queue: UpdateQueue<S>,
 	action: Action<S>,
 ) => {
-	const update = createUpdate(action);
+	const lane = requestUpdateLane(fiber);
+	const update = createUpdate(action, lane);
 	enqueueUpdate(queue, update);
-	scheduleUpdateOnFiber(fiber);
+	scheduleUpdateOnFiber(fiber, lane);
 };
 
 /**

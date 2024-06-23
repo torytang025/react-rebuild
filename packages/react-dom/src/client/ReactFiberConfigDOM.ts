@@ -112,3 +112,27 @@ export function removeChildFromContainer(
 		container.removeChild(child);
 	}
 }
+
+const localPromise =
+	typeof Promise === "function" ? Promise : { resolve: (value: any) => value };
+export const scheduleTimeout =
+	typeof setTimeout === "function" ? setTimeout : () => {};
+
+// -------------------
+//      Microtasks
+// -------------------
+
+function handleErrorInNextTick(error: Error) {
+	setTimeout(() => {
+		throw error;
+	});
+}
+
+export const supportsMicrotasks = true;
+export const scheduleMicrotask: (callback: () => void) => void =
+	typeof queueMicrotask === "function"
+		? queueMicrotask
+		: typeof localPromise !== "undefined"
+			? (callback) =>
+					localPromise.resolve(null).then(callback).catch(handleErrorInNextTick)
+			: scheduleTimeout;

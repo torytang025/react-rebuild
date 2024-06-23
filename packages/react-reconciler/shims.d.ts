@@ -16,7 +16,7 @@ declare module "ReactFiberConfig" {
 
 	function createTextInstance(text: string): Instance;
 
-	export function finalizeInitialChildren(
+	function finalizeInitialChildren(
 		domElement: Instance,
 		type: string,
 		props: Props,
@@ -37,7 +37,7 @@ declare module "ReactFiberConfig" {
 		child: Instance | TextInstance,
 	): void;
 
-	export function insertBefore(
+	function insertBefore(
 		parentInstance: Instance,
 		child: Instance | TextInstance,
 		beforeChild: Instance | TextInstance,
@@ -65,4 +65,8 @@ declare module "ReactFiberConfig" {
 		container: Container,
 		child: Instance | TextInstance,
 	): void;
+
+	const supportsMicrotasks: boolean;
+
+	function scheduleMicrotask(callback: () => void): void;
 }

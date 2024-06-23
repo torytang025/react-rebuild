@@ -3,6 +3,7 @@ import { logger } from "shared/logger";
 import { mountChildFibers, reconcileChildFibers } from "./ReactChildFiber";
 import type { Fiber } from "./ReactFiber";
 import { renderWithHooks } from "./ReactFiberHooks";
+import type { Lanes } from "./ReactFiberLane";
 import { processUpdateQueue } from "./ReactFiberUpdateQueue";
 import {
 	Fragment,
@@ -18,14 +19,22 @@ import {
  * 1. compute the next state of the fiber node
  * 2. create child fibers for the fiber node
  */
-export function beginWork(current: Fiber | null, workInProgress: Fiber) {
+export function beginWork(
+	current: Fiber | null,
+	workInProgress: Fiber,
+	renderLanes: Lanes,
+) {
 	logger.info("beginWork", workInProgress.tag, workInProgress.type);
 
 	switch (workInProgress.tag) {
 		case HostRoot:
-			return updateHostRoot(current, workInProgress as Fiber<Element | null>);
+			return updateHostRoot(
+				current,
+				workInProgress as Fiber<Element | null>,
+				renderLanes,
+			);
 		case FunctionComponent:
-			return updateFunctionComponent(current, workInProgress);
+			return updateFunctionComponent(current, workInProgress, renderLanes);
 		case HostComponent:
 			return updateHostComponent(current, workInProgress);
 		case HostText:
@@ -51,6 +60,7 @@ export function beginWork(current: Fiber | null, workInProgress: Fiber) {
 function updateHostRoot(
 	current: Fiber | null,
 	workInProgress: Fiber<Element | null>,
+	renderLanes: Lanes,
 ) {
 	// This is null for the first render pass.
 	const baseSate = workInProgress.memorizedState;
@@ -58,7 +68,7 @@ function updateHostRoot(
 	// fot host root, the pending update is the element to render
 	const pending = updateQueue.shared.pending;
 
-	const { memorizedState } = processUpdateQueue(baseSate, pending);
+	const { memorizedState } = processUpdateQueue(baseSate, pending, renderLanes);
 	updateQueue.shared.pending = null;
 
 	workInProgress.memorizedState = memorizedState;
@@ -73,7 +83,11 @@ function updateHostRoot(
  * Update the state of a function component fiber node.
  * The pending props of a function component fiber node is the props passed to the component.
  */
-function updateFunctionComponent(current: Fiber | null, workInProgress: Fiber) {
+function updateFunctionComponent(
+	current: Fiber | null,
+	workInProgress: Fiber,
+	renderLanes: Lanes,
+) {
 	const Component = workInProgress.type;
 	const pendingProps = workInProgress.pendingProps;
 	const nextChildren = renderWithHooks(
@@ -81,6 +95,7 @@ function updateFunctionComponent(current: Fiber | null, workInProgress: Fiber) {
 		workInProgress,
 		Component,
 		pendingProps,
+		renderLanes,
 	);
 	reconcileChildren(current, workInProgress, nextChildren);
 

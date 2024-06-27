@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 function App() {
-	const [num, setNum] = useState(0);
+	const [num, setNum] = useState(9);
 
 	return (
 		<ul

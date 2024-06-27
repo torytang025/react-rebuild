@@ -70,11 +70,14 @@ export type Action<State> = State | ((prevState: State) => State);
 /**
  * The Update type is an object that represents the update to be applied to the component. It has the following structure:
  * - action: The action that needs to be applied to the component.
+ * - lane: The lane that the update belongs to.
+ * - next: A reference to the next update in the circular list.
  */
-export type Update<State = any> = {
-	action: Action<State>;
+export type Update<S = any, T = any> = {
+	action: Action<S>;
 	lane: Lane;
-	next: Update<any> | null;
+
+	next: Update<T> | null;
 };
 
 export type SharedQueue<State> = {

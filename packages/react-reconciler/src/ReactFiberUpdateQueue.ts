@@ -1,8 +1,7 @@
 import { logger } from "shared/logger";
 import type { Action, Update, UpdateQueue } from "shared/ReactTypes";
 
-import type { Lane } from "./ReactFiberLane";
-import { type Lanes, NoLane } from "./ReactFiberLane";
+import type { Lane, Lanes } from "./ReactFiberLane";
 
 export function createUpdate<State>(
 	action: Action<State>,
@@ -59,7 +58,7 @@ export function processUpdateQueue<State>(
 
 	if (pendingUpdate !== null) {
 		const firstPendingUpdate = pendingUpdate.next;
-		let newBaseState = null;
+		let newBaseState = baseState;
 
 		if (firstPendingUpdate !== null) {
 			let pending: Update | null = firstPendingUpdate;

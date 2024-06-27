@@ -1,4 +1,4 @@
-import type { FiberNode } from "react-reconciler/ReactFiber";
+import type { Fiber } from "react-reconciler/ReactFiber";
 import { hasOwnProperty } from "shared/hasOwnProperty";
 
 import type { AnyNativeEvent } from "./PluginModuleType";
@@ -16,7 +16,7 @@ export class SyntheticBaseEvent<T extends Record<string, any>>
 	implements BaseSyntheticEvent
 {
 	_reactName: string | null;
-	_targetInst: FiberNode | null;
+	_targetInst: Fiber | null;
 	type: string;
 	nativeEvent: AnyNativeEvent;
 	target: null | EventTarget;
@@ -27,7 +27,7 @@ export class SyntheticBaseEvent<T extends Record<string, any>>
 	constructor(
 		reactName: string | null,
 		reactEventType: string,
-		targetInst: FiberNode | null,
+		targetInst: Fiber | null,
 		nativeEvent: AnyNativeEvent,
 		nativeEventTarget: null | EventTarget,
 		Interface: T,
@@ -90,7 +90,7 @@ function createSyntheticEvent<T extends Record<string, any>>(Interface: T) {
 	return (
 		reactName: string | null,
 		reactEventType: string,
-		targetInst: FiberNode | null,
+		targetInst: Fiber | null,
 		nativeEvent: AnyNativeEvent,
 		nativeEventTarget: null | EventTarget,
 	) =>

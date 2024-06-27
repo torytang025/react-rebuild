@@ -2,7 +2,7 @@ import {
 	createContainer,
 	updateContainer,
 } from "react-reconciler/ReactFiberReconciler";
-import type { FiberRootNode } from "react-reconciler/ReactFiberRoot";
+import type { FiberRoot } from "react-reconciler/ReactFiberRoot";
 import { logger } from "shared/logger";
 import type { ReactNodeList } from "shared/ReactTypes";
 
@@ -11,9 +11,9 @@ import { COMMENT_NODE } from "./HTMLNodeType";
 import type { Container } from "./ReactFiberConfigDOM";
 
 class ReactDOMRoot {
-	_internalRoot: FiberRootNode;
+	_internalRoot: FiberRoot;
 
-	constructor(internalRoot: FiberRootNode) {
+	constructor(internalRoot: FiberRoot) {
 		this._internalRoot = internalRoot;
 	}
 

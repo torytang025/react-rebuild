@@ -1,3 +1,5 @@
+import type { Lane } from "react-reconciler/ReactFiberLane";
+
 export type Type = any;
 export type Props = any;
 export type Key = string | number | bigint | null | undefined;
@@ -68,9 +70,14 @@ export type Action<State> = State | ((prevState: State) => State);
 /**
  * The Update type is an object that represents the update to be applied to the component. It has the following structure:
  * - action: The action that needs to be applied to the component.
+ * - lane: The lane that the update belongs to.
+ * - next: A reference to the next update in the circular list.
  */
-export type Update<State> = {
-	action: Action<State>;
+export type Update<S = any, T = any> = {
+	action: Action<S>;
+	lane: Lane;
+
+	next: Update<T> | null;
 };
 
 export type SharedQueue<State> = {

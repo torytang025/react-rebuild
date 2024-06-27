@@ -1,4 +1,4 @@
-import type { FiberNode } from "react-reconciler/ReactFiber";
+import type { Fiber } from "react-reconciler/ReactFiber";
 
 import type { DOMEventName } from "../DOMEventNames";
 import {
@@ -16,7 +16,7 @@ import { SyntheticEvent } from "../SyntheticEvent";
 function extractEvents(
 	dispatchQueue: DispatchQueue,
 	domEventName: DOMEventName,
-	targetInst: null | FiberNode,
+	targetInst: null | Fiber,
 	nativeEvent: AnyNativeEvent,
 	nativeEventTarget: null | EventTarget,
 	eventSystemFlags: EventSystemFlags,

@@ -8,7 +8,7 @@ import {
 import { logger } from "shared/logger";
 import type { Props } from "shared/ReactTypes";
 
-import type { FiberNode } from "./ReactFiber";
+import type { Fiber } from "./ReactFiber";
 import type { Flags } from "./ReactFiberFlags";
 import { NoFlags, Update } from "./ReactFiberFlags";
 import {
@@ -19,14 +19,14 @@ import {
 	HostText,
 } from "./ReactWorkTag";
 
-function markUpdate(workInProgress: FiberNode) {
+function markUpdate(workInProgress: Fiber) {
 	workInProgress.flags |= Update;
 }
 
 /**
  * Append all children of the current fiber node to the parent instance.
  */
-function appendAllChildren(parent: Instance, workInProgress: FiberNode) {
+function appendAllChildren(parent: Instance, workInProgress: Fiber) {
 	let node = workInProgress.child;
 
 	while (node !== null) {
@@ -55,8 +55,8 @@ function appendAllChildren(parent: Instance, workInProgress: FiberNode) {
 }
 
 function updateHostComponent(
-	current: FiberNode,
-	workInProgress: FiberNode,
+	current: Fiber,
+	workInProgress: Fiber,
 	type: string,
 	newProps: Props,
 ) {
@@ -69,8 +69,8 @@ function updateHostComponent(
 }
 
 function updateHostText(
-	current: FiberNode,
-	workInProgress: FiberNode,
+	current: Fiber,
+	workInProgress: Fiber,
 	oldText: string,
 	newText: string,
 ) {
@@ -82,7 +82,7 @@ function updateHostText(
 /**
  * Bubble all side-effects up to the parent fiber node.
  */
-function bubbleProperties(completedWork: FiberNode) {
+function bubbleProperties(completedWork: Fiber) {
 	let subtreeFlags = NoFlags;
 	let child = completedWork.child;
 
@@ -98,8 +98,8 @@ function bubbleProperties(completedWork: FiberNode) {
 }
 
 export function completeWork(
-	current: FiberNode | null,
-	workInProgress: FiberNode,
+	current: Fiber | null,
+	workInProgress: Fiber,
 ): null {
 	const newProps = workInProgress.pendingProps;
 	const type = workInProgress.type;

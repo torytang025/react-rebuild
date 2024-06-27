@@ -8,7 +8,9 @@ import type {
 	SetStateReturn,
 } from "shared/ReactTypes";
 
-import type { FiberNode } from "./ReactFiber";
+import type { Fiber } from "./ReactFiber";
+import type { Lanes } from "./ReactFiberLane";
+import { NoLanes, requestUpdateLane } from "./ReactFiberLane";
 import {
 	createUpdate,
 	createUpdateQueue,
@@ -24,16 +26,20 @@ type Hook<S = unknown, T = unknown> = {
 	next: Hook<T> | null;
 };
 
-let currentlyRenderingFiber: FiberNode<any> | null = null;
+let renderLanes: Lanes = NoLanes;
+
+let currentlyRenderingFiber: Fiber<any> | null = null;
 let currentHook: Hook<any, any> | null = null;
 let workInProgressHook: Hook<any, any> | null = null;
 
 export function renderWithHooks(
-	current: FiberNode | null,
-	workInProgress: FiberNode,
+	current: Fiber | null,
+	workInProgress: Fiber,
 	Component: Component,
 	props: Props,
+	nextRenderLanes: Lanes,
 ) {
+	renderLanes = nextRenderLanes;
 	currentlyRenderingFiber = workInProgress;
 	// Reset the memorizedState, where the hooks will be stored, to null
 	// to indicate that it's a new hook list
@@ -56,6 +62,7 @@ function finishRenderingHooks() {
 	currentlyRenderingFiber = null;
 	currentHook = null;
 	workInProgressHook = null;
+	renderLanes = NoLanes;
 }
 
 const mountWorkInProgressHook = <S>(): Hook<S> => {
@@ -101,7 +108,7 @@ const mountState = <S>(initialState: InitialState<S>): SetStateReturn<S> => {
 	const queue = hook.queue!;
 	const dispatch: Dispatch<S> = dispatchSetState.bind<
 		null,
-		[FiberNode<S>, UpdateQueue<S>],
+		[Fiber<S>, UpdateQueue<S>],
 		[Action<S>],
 		void
 	>(null, currentlyRenderingFiber!, queue);
@@ -201,9 +208,16 @@ const updateStateImpl = <S>(): SetStateReturn<S> => {
 
 	const baseSate = hook.memorizedState!;
 	const pendingUpdate = queue.shared.pending;
+	// Clear the pending update
+	queue.shared.pending = null;
+
 	const dispatch = queue.dispatch!;
 
-	const { memorizedState } = processUpdateQueue(baseSate, pendingUpdate);
+	const { memorizedState } = processUpdateQueue(
+		baseSate,
+		pendingUpdate,
+		renderLanes,
+	);
 	hook.memorizedState = memorizedState;
 
 	return [hook.memorizedState, dispatch];
@@ -214,13 +228,14 @@ const updateState = <S>(): SetStateReturn<S> => {
 };
 
 const dispatchSetState = <S>(
-	fiber: FiberNode<S>,
+	fiber: Fiber<S>,
 	queue: UpdateQueue<S>,
 	action: Action<S>,
 ) => {
-	const update = createUpdate(action);
+	const lane = requestUpdateLane(fiber);
+	const update = createUpdate(action, lane);
 	enqueueUpdate(queue, update);
-	scheduleUpdateOnFiber(fiber);
+	scheduleUpdateOnFiber(fiber, lane);
 };
 
 /**

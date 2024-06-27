@@ -1,4 +1,4 @@
-import type { FiberNode } from "react-reconciler/ReactFiber";
+import type { Fiber } from "react-reconciler/ReactFiber";
 import { logger } from "shared/logger";
 
 import { getFiberCurrentPropsFromNode } from "../client/ReactDOMComponent";
@@ -29,7 +29,7 @@ SimpleEventPlugin.registerEvents();
 function extractEvents(
 	dispatchQueue: DispatchQueue,
 	domEventName: DOMEventName,
-	targetInst: null | FiberNode,
+	targetInst: null | Fiber,
 	nativeEvent: AnyNativeEvent,
 	nativeEventTarget: null | EventTarget,
 	eventSystemFlags: EventSystemFlags,
@@ -121,7 +121,7 @@ export function dispatchEventForPluginEventSystem(
 	domEventName: DOMEventName,
 	eventSystemFlags: EventSystemFlags,
 	nativeEvent: AnyNativeEvent,
-	targetInst: FiberNode | null,
+	targetInst: Fiber | null,
 	targetContainer: EventTarget,
 ): void {
 	dispatchEventsForPlugins(
@@ -137,7 +137,7 @@ function dispatchEventsForPlugins(
 	domEventName: DOMEventName,
 	eventSystemFlags: EventSystemFlags,
 	nativeEvent: AnyNativeEvent,
-	targetInst: FiberNode | null,
+	targetInst: Fiber | null,
 	targetContainer: EventTarget,
 ) {
 	const nativeEventTarget = getEventTarget(nativeEvent);

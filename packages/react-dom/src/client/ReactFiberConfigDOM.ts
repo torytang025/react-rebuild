@@ -1,4 +1,4 @@
-import type { FiberNode } from "react-reconciler/ReactFiber";
+import type { Fiber } from "react-reconciler/ReactFiber";
 import type { Props } from "shared/ReactTypes";
 
 import { COMMENT_NODE } from "./HTMLNodeType";
@@ -16,7 +16,7 @@ export type TextInstance = Text;
 export function createInstance(
 	type: string,
 	props: Props,
-	internalInstanceHandle: FiberNode,
+	internalInstanceHandle: Fiber,
 ): Instance {
 	const element = document.createElement(type);
 	precacheFiberNode(internalInstanceHandle, element);
@@ -112,3 +112,27 @@ export function removeChildFromContainer(
 		container.removeChild(child);
 	}
 }
+
+const localPromise =
+	typeof Promise === "function" ? Promise : { resolve: (value: any) => value };
+export const scheduleTimeout =
+	typeof setTimeout === "function" ? setTimeout : () => {};
+
+// -------------------
+//      Microtasks
+// -------------------
+
+function handleErrorInNextTick(error: Error) {
+	setTimeout(() => {
+		throw error;
+	});
+}
+
+export const supportsMicrotasks = true;
+export const scheduleMicrotask: (callback: () => void) => void =
+	typeof queueMicrotask === "function"
+		? queueMicrotask
+		: typeof localPromise !== "undefined"
+			? (callback) =>
+					localPromise.resolve(null).then(callback).catch(handleErrorInNextTick)
+			: scheduleTimeout;

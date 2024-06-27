@@ -8,7 +8,7 @@ import type {
 	ReactFragment,
 } from "shared/ReactTypes";
 
-import type { FiberNode } from "./ReactFiber";
+import type { Fiber } from "./ReactFiber";
 import {
 	createFiberFromElement,
 	createFiberFromFragment,
@@ -18,12 +18,9 @@ import {
 import { ChildDeletion, Placement } from "./ReactFiberFlags";
 import { Fragment, HostText } from "./ReactWorkTag";
 
-type ExistintChildrenMap = Map<string | number | bigint, FiberNode>;
+type ExistintChildrenMap = Map<string | number | bigint, Fiber>;
 
-function throwOnInvalidObjectType(
-	returnFiber: FiberNode,
-	newChild: ReactElement,
-) {
+function throwOnInvalidObjectType(returnFiber: Fiber, newChild: ReactElement) {
 	const childString = Object.prototype.toString.call(newChild);
 
 	return logger.error(
@@ -38,7 +35,7 @@ function throwOnInvalidObjectType(
 }
 
 export function createChildReconciler(shouldTrackSideEffects: boolean) {
-	function deleteChild(returnFiber: FiberNode, childToDelete: FiberNode): void {
+	function deleteChild(returnFiber: Fiber, childToDelete: Fiber): void {
 		if (!shouldTrackSideEffects) {
 			return;
 		}
@@ -52,8 +49,8 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 	}
 
 	function deleteRemainingChildren(
-		returnFiber: FiberNode,
-		currentFirstChild: FiberNode | null,
+		returnFiber: Fiber,
+		currentFirstChild: Fiber | null,
 	): null {
 		if (!shouldTrackSideEffects) {
 			return null;
@@ -68,7 +65,7 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 		return null;
 	}
 
-	function useFiber(fiber: FiberNode, pendingProps: Props): FiberNode {
+	function useFiber(fiber: Fiber, pendingProps: Props): Fiber {
 		const clone = createWorkInProgress(fiber, pendingProps);
 		clone.index = 0;
 		clone.sibling = null;
@@ -78,12 +75,10 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 	/**
 	 * Collect the remaining old children into a map for reconciliation.
 	 */
-	function mapRemainingChildren(
-		currentFirstChild: FiberNode,
-	): ExistintChildrenMap {
+	function mapRemainingChildren(currentFirstChild: Fiber): ExistintChildrenMap {
 		const existingChildren: ExistintChildrenMap = new Map();
 
-		let existingChild: FiberNode | null = currentFirstChild;
+		let existingChild: Fiber | null = currentFirstChild;
 		while (existingChild !== null) {
 			if (existingChild.key != null) {
 				existingChildren.set(existingChild.key, existingChild);
@@ -97,7 +92,7 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 	}
 
 	function placeChild(
-		newFiber: FiberNode,
+		newFiber: Fiber,
 		lastPlacedIndex: number,
 		newIndex: number,
 	): number {
@@ -132,7 +127,7 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 		}
 	}
 
-	function placeSingleChild(newFiber: FiberNode) {
+	function placeSingleChild(newFiber: Fiber) {
 		// When a new fiber is created, it is placed into the work-in-progress tree.
 		if (shouldTrackSideEffects && newFiber.alternate === null) {
 			newFiber.flags |= Placement;
@@ -141,10 +136,10 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 	}
 
 	function updateTextNode(
-		returnFiber: FiberNode,
-		current: FiberNode | null,
+		returnFiber: Fiber,
+		current: Fiber | null,
 		textContent: string,
-	): FiberNode {
+	): Fiber {
 		if (current === null || current.tag !== HostText) {
 			// Insert
 			const created = createFiberFromText(textContent);
@@ -159,10 +154,10 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 	}
 
 	function updateElement(
-		returnFiber: FiberNode,
-		current: FiberNode | null,
+		returnFiber: Fiber,
+		current: Fiber | null,
 		element: ReactElement,
-	): FiberNode {
+	): Fiber {
 		const elementType = element.type;
 
 		if (elementType === REACT_FRAGMENT_TYPE) {
@@ -190,11 +185,11 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 	}
 
 	function updateFragment(
-		returnFiber: FiberNode,
-		current: FiberNode | null,
+		returnFiber: Fiber,
+		current: Fiber | null,
 		fragment: ReactFragment,
 		key: Key,
-	): FiberNode {
+	): Fiber {
 		if (current === null || current.tag !== Fragment) {
 			// Insert
 			const newFiber = createFiberFromFragment(fragment, key);
@@ -211,9 +206,9 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 	}
 
 	function createChild(
-		returnFiber: FiberNode,
+		returnFiber: Fiber,
 		newChild: ReactElement,
-	): FiberNode | null {
+	): Fiber | null {
 		if (
 			(typeof newChild === "string" && newChild !== "") ||
 			typeof newChild === "number" ||
@@ -247,10 +242,10 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 	}
 
 	function updateSlot(
-		returnFiber: FiberNode,
-		oldFiber: FiberNode | null,
+		returnFiber: Fiber,
+		oldFiber: Fiber | null,
 		newChild: ReactElement,
-	): FiberNode | null {
+	): Fiber | null {
 		// if the key matches, we can reuse and update the oldFiber, otherwise return null
 		const key = oldFiber === null ? null : oldFiber.key;
 
@@ -295,10 +290,10 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 
 	function updateFromMap(
 		existingChildren: ExistintChildrenMap,
-		returnFiber: FiberNode,
+		returnFiber: Fiber,
 		newIdx: number,
 		newChild: ReactElement,
-	): FiberNode | null {
+	): Fiber | null {
 		if (
 			(typeof newChild === "string" && newChild !== "") ||
 			typeof newChild === "number" ||
@@ -344,8 +339,8 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 	 * A core function in React reconciliation, which deals with an array of children.
 	 */
 	function reconcileChildrenArray(
-		returnFiber: FiberNode,
-		currentFirstChild: FiberNode | null,
+		returnFiber: Fiber,
+		currentFirstChild: Fiber | null,
 		newChildren: Array<ReactElement>,
 	) {
 		// Let's break down the reconciliation process into four steps:
@@ -364,13 +359,13 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 		// If the old child and the new child have the same key, we reuse the old child.
 		// Otherwise, we break the loop and move to the next step.
 
-		let resultingFirstChild: FiberNode | null = null;
-		let previousNewFiber: FiberNode | null = null;
+		let resultingFirstChild: Fiber | null = null;
+		let previousNewFiber: Fiber | null = null;
 
 		let oldFiber = currentFirstChild;
 		let lastPlacedIndex = 0;
 		let newIdx = 0;
-		let nextOldFiber: FiberNode | null = null;
+		let nextOldFiber: Fiber | null = null;
 		for (; oldFiber !== null && newIdx < newChildren.length; newIdx++) {
 			// This happens when the new child is null or undefined, so the index is not successive.
 			// For example: [ div, null, div ], the index of the second div is 2.
@@ -501,10 +496,10 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 	 * ```
 	 */
 	function reconcileSingleElement(
-		returnFiber: FiberNode,
-		currentFirstChild: FiberNode | null,
+		returnFiber: Fiber,
+		currentFirstChild: Fiber | null,
 		element: ReactElement,
-	): FiberNode {
+	): Fiber {
 		const key = element.key;
 		let child = currentFirstChild;
 		while (child !== null) {
@@ -570,10 +565,10 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 	 * <div><span /></div> -> <div>foo</div>
 	 */
 	function reconcileSingleTextNode(
-		returnFiber: FiberNode,
-		currentFirstChild: FiberNode | null,
+		returnFiber: Fiber,
+		currentFirstChild: Fiber | null,
 		content: string,
-	): FiberNode {
+	): Fiber {
 		// Since there is no key for text nodes, we only need to check if the current child is a text node
 		if (currentFirstChild !== null && currentFirstChild.tag === HostText) {
 			// Same as the case for elements, if the current child is a text node, reuse it and delete the remaining children
@@ -593,8 +588,8 @@ export function createChildReconciler(shouldTrackSideEffects: boolean) {
 	}
 
 	function reconcileChildFibers(
-		returnFiber: FiberNode,
-		currentFirstChild: FiberNode | null,
+		returnFiber: Fiber,
+		currentFirstChild: Fiber | null,
 		nextChild: ReactElement,
 	) {
 		const isUnkeyedTopLevelFragment =

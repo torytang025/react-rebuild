@@ -66,10 +66,10 @@ function updateHostRoot(
 	const baseSate = workInProgress.memorizedState;
 	const updateQueue = workInProgress.updateQueue!;
 	// fot host root, the pending update is the element to render
-	const pending = updateQueue.shared.pending;
+	const pending = updateQueue.pending;
 
 	const { memorizedState } = processUpdateQueue(baseSate, pending, renderLanes);
-	updateQueue.shared.pending = null;
+	updateQueue.pending = null;
 
 	workInProgress.memorizedState = memorizedState;
 

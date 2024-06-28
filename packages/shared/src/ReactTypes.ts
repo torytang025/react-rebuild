@@ -80,17 +80,15 @@ export type Update<S = any, T = any> = {
 	next: Update<T> | null;
 };
 
-export type SharedQueue<State> = {
-	pending: Update<State> | null;
-};
-
 /**
- * The updateQueue property is an object that holds the pending updates for a fiber. It is used to manage the state updates for a component. The updateQueue object has the following structure:
-	- shared: An object that holds the pending update for the fiber.
-	- shared.pending: The pending update for the fiber. This is an object that represents the update to be applied to the component.
+ * The updateQueue property is an object that holds the pending updates for a fiber.
+ * It is used to manage the state updates for a component. The updateQueue object has the following structure:
+ *
+ * - pending: The pending update for the fiber. This is an object that represents the update to be applied to the component.
+ * - dispatch: A function that takes an action and enqueues it in the update queue.
  */
 export type UpdateQueue<State> = {
-	shared: SharedQueue<State>;
+	pending: Update<State> | null;
 	dispatch: Dispatch<State> | null;
 };
 

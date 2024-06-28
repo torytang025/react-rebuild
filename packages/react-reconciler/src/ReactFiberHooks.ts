@@ -207,9 +207,9 @@ const updateStateImpl = <S>(): SetStateReturn<S> => {
 	}
 
 	const baseSate = hook.memorizedState!;
-	const pendingUpdate = queue.shared.pending;
+	const pendingUpdate = queue.pending;
 	// Clear the pending update
-	queue.shared.pending = null;
+	queue.pending = null;
 
 	const dispatch = queue.dispatch!;
 

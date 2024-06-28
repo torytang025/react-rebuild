@@ -17,9 +17,7 @@ export function createUpdate<State>(
 
 export function createUpdateQueue<State>(): UpdateQueue<State> {
 	return {
-		shared: {
-			pending: null,
-		},
+		pending: null,
 		dispatch: null,
 	};
 }
@@ -28,7 +26,7 @@ export function enqueueUpdate<State>(
 	updateQueue: UpdateQueue<State>,
 	update: Update<State>,
 ) {
-	const pending = updateQueue.shared.pending;
+	const pending = updateQueue.pending;
 
 	// Link the update to the end of the circular list.
 	// Example: If the list is [A, B, C] and the new update is D,
@@ -40,7 +38,7 @@ export function enqueueUpdate<State>(
 		update.next = pending.next;
 		pending.next = update;
 	}
-	updateQueue.shared.pending = update;
+	updateQueue.pending = update;
 }
 
 /**

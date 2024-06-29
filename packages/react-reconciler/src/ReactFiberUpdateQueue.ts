@@ -19,6 +19,11 @@ export function createUpdateQueue<State>(): UpdateQueue<State> {
 	return {
 		pending: null,
 		dispatch: null,
+
+		// which is the last effect that was created
+		// and this is used to link the effects together
+		// with a circular linked list
+		lastEffect: null,
 	};
 }
 

@@ -9,6 +9,8 @@ import {
 	updateProperties,
 } from "./ReactDOMComponent";
 
+export { detachDeletedInstance } from "./ReactDOMComponent";
+
 export type Container = Element;
 export type Instance = Element;
 export type TextInstance = Text;

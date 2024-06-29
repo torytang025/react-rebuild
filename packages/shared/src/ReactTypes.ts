@@ -1,4 +1,5 @@
 import type { Lane } from "react-reconciler/ReactFiberLane";
+import type { HookFlags } from "react-reconciler/ReactHookEffectTags";
 
 export type Type = any;
 export type Props = any;
@@ -90,6 +91,7 @@ export type Update<S = any, T = any> = {
 export type UpdateQueue<State> = {
 	pending: Update<State> | null;
 	dispatch: Dispatch<State> | null;
+	lastEffect: Effect | null;
 };
 
 export type InitialState<S> = S | (() => S);
@@ -98,6 +100,20 @@ export type SetStateReturn<S> = [S, Dispatch<S>];
 
 export type UseState = <S>(initialState: InitialState<S>) => SetStateReturn<S>;
 
+export type DependencyList = readonly unknown[];
+export type Destroy = (() => void) | void;
+export type EffectCallback = () => Destroy | void;
+export type Effect = {
+	tag: HookFlags;
+	create: EffectCallback;
+	destroy?: Destroy;
+	deps?: DependencyList;
+	next: Effect | null;
+};
+
+export type UseEffect = (effect: EffectCallback, deps?: DependencyList) => void;
+
 export type Dispatcher = {
 	useState: UseState;
+	useEffect: UseEffect;
 };

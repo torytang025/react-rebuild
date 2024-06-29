@@ -1,6 +1,6 @@
 import { logger } from "shared/logger";
 import ReactSharedInternals from "shared/ReactSharedInternals";
-import type { Dispatcher, UseState } from "shared/ReactTypes";
+import type { Dispatcher, UseEffect, UseState } from "shared/ReactTypes";
 
 function resolveDispatcher(): Dispatcher {
 	const dispatcher = ReactSharedInternals.H;
@@ -17,4 +17,9 @@ function resolveDispatcher(): Dispatcher {
 export const useState: UseState = (initialState) => {
 	const dispatcher = resolveDispatcher();
 	return dispatcher.useState(initialState);
+};
+
+export const useEffect: UseEffect = (create, deps) => {
+	const dispatcher = resolveDispatcher();
+	return dispatcher.useEffect(create, deps);
 };

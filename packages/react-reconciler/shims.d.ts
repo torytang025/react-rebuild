@@ -66,6 +66,8 @@ declare module "ReactFiberConfig" {
 		child: Instance | TextInstance,
 	): void;
 
+	function detachDeletedInstance(node: Instance | TextInstance): void;
+
 	const supportsMicrotasks: boolean;
 
 	function scheduleMicrotask(callback: () => void): void;

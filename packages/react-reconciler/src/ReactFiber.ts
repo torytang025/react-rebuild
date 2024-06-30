@@ -168,6 +168,7 @@ export class Fiber<State = unknown> {
 	memorizedState: State | null;
 	/**
 	 * the queue of updates that need to be applied to this fiber
+	 * For function components, the update queue is a linked list of hooks that store the component's state.
 	 */
 	updateQueue: UpdateQueue<State> | null;
 

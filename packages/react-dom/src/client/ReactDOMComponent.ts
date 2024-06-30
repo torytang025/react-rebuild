@@ -22,6 +22,11 @@ export function precacheFiberNode(
 	(node as any)[internalInstanceKey] = hostInst;
 }
 
+export function detachDeletedInstance(node: Instance | TextInstance): void {
+	delete (node as any)[internalInstanceKey];
+	delete (node as any)[internalPropsKey];
+}
+
 function setProp(
 	domElement: Element,
 	tag: string,

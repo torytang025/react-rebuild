@@ -2,6 +2,7 @@ import type { TextInstance } from "ReactFiberConfig";
 import {
 	commitTextUpdate,
 	commitUpdate,
+	detachDeletedInstance,
 	insertBefore,
 	removeChild,
 	removeChildFromContainer,
@@ -15,14 +16,30 @@ import {
 import { logger } from "shared/logger";
 
 import type { Fiber } from "./ReactFiber";
-import { MutationMask, Placement, Update } from "./ReactFiberFlags";
+import {
+	ChildDeletion,
+	MutationMask,
+	NoFlags,
+	Passive,
+	PassiveMask,
+	Placement,
+	Update,
+} from "./ReactFiberFlags";
+import type { Lanes } from "./ReactFiberLane";
 import type { FiberRoot } from "./ReactFiberRoot";
+import type { HookFlags } from "./ReactHookEffectTags";
+import { HasEffect, PassiveEffect } from "./ReactHookEffectTags";
 import {
 	FunctionComponent,
 	HostComponent,
 	HostRoot,
 	HostText,
 } from "./ReactWorkTag";
+
+let hostParent: Instance | Container | null = null;
+let hostParentIsContainer: boolean = false;
+
+let nextEffectFiber: Fiber | null = null;
 
 export function commitMutationEffects(root: FiberRoot, finishedWork: Fiber) {
 	commitMutationEffectsOnFiber(root, finishedWork);
@@ -36,8 +53,32 @@ function detachFiberMutation(fiber: Fiber) {
 	fiber.return = null;
 }
 
-let hostParent: Instance | Container | null = null;
-let hostParentIsContainer: boolean = false;
+function detachFiberAfterEffects(fiber: Fiber) {
+	const alternate = fiber.alternate;
+	if (alternate !== null) {
+		fiber.alternate = null;
+		detachFiberAfterEffects(alternate);
+	}
+
+	if (fiber.tag === HostComponent) {
+		const hostInstance = fiber.stateNode;
+		if (hostInstance !== null) {
+			detachDeletedInstance(hostInstance);
+		}
+	}
+
+	fiber.child = null;
+	fiber.deletions = null;
+	fiber.sibling = null;
+	fiber.stateNode = null;
+	fiber.return = null;
+	fiber.memorizedProps = null;
+	fiber.memorizedState = null;
+	fiber.pendingProps = null;
+	fiber.stateNode = null;
+	// clear the effects
+	fiber.updateQueue = null;
+}
 
 /**
  * Although we only need to delete the top fiber, we still need to traverse the fiber tree
@@ -404,4 +445,231 @@ function insertOrAppendPlacementNodeIntoContainer(
 			}
 		}
 	}
+}
+
+function commitPassiveUnmountInsideDeletedTreeOnFiber(current: Fiber) {
+	switch (current.tag) {
+		case FunctionComponent: {
+			commitHookPassiveUnmountEffects(current, PassiveEffect);
+			return;
+		}
+	}
+}
+
+function commitPassiveUnmountEffectsInsideOfDeletedTreeBegin(
+	childToDelete: Fiber,
+) {
+	while (nextEffectFiber !== null) {
+		const fiber = nextEffectFiber;
+
+		commitPassiveUnmountInsideDeletedTreeOnFiber(fiber);
+
+		// commit all the unmount passive effects until we reach the leaf node.
+		const child = fiber.child;
+		if (child !== null) {
+			child.return = fiber;
+			nextEffectFiber = child;
+		} else {
+			// Then we detach deleted childrend and commit the sibling effects
+			// during returning back to childToDelete.
+			commitPassiveUnmountEffectsInsideOfDeletedTreeComplete(childToDelete);
+		}
+	}
+}
+
+function commitPassiveUnmountEffectsInsideOfDeletedTreeComplete(
+	childToDelete: Fiber,
+) {
+	while (nextEffectFiber !== null) {
+		const fiber = nextEffectFiber;
+		const sibling = fiber.sibling;
+		const returnFiber = fiber.return;
+
+		detachFiberAfterEffects(fiber);
+
+		if (fiber === childToDelete) {
+			nextEffectFiber = null;
+			return;
+		}
+
+		// clear up effects on siblings
+		if (sibling !== null) {
+			sibling.return = returnFiber;
+			// Set the sibling to the nextEffectFiber and continue
+			// to traverse the sibling fibers in the begin phase.
+			nextEffectFiber = sibling;
+			return;
+		}
+
+		// returning back
+		nextEffectFiber = returnFiber;
+	}
+}
+
+/**
+ * Loops through the circular linked list of effects
+ * and commits the destroy effects.
+ */
+function commitHookEffectListUnmount(
+	finishedWork: Fiber,
+	hookFlags: HookFlags,
+) {
+	const updateQueue = finishedWork.updateQueue;
+	const lastEffect = updateQueue !== null ? updateQueue.lastEffect : null;
+	if (lastEffect !== null) {
+		const firstEffect = lastEffect.next;
+		let effect = firstEffect!;
+		do {
+			if ((effect.tag & hookFlags) === hookFlags) {
+				const destroy = effect.destroy;
+				effect.destroy = undefined;
+				if (destroy !== undefined) {
+					destroy();
+				}
+			}
+			effect = effect.next!;
+		} while (effect !== firstEffect);
+	}
+}
+
+function commitHookPassiveUnmountEffects(
+	finishedWork: Fiber,
+	hookFlags: HookFlags,
+) {
+	commitHookEffectListUnmount(finishedWork, hookFlags);
+}
+
+function recursivelyTraversePassiveUnmountEffects(parent: Fiber) {
+	// Process the deletion effects first before children deletion effects fires.
+	if ((parent.flags & ChildDeletion) !== NoFlags) {
+		const deletions = parent.deletions;
+		if (deletions !== null) {
+			for (let i = 0; i < deletions.length; i++) {
+				const childToDelete = deletions[i];
+				nextEffectFiber = childToDelete;
+				commitPassiveUnmountEffectsInsideOfDeletedTreeBegin(childToDelete);
+			}
+		}
+	}
+
+	// Process the passive effects on the children.
+	if (parent.subtreeFlags & PassiveMask) {
+		let child = parent.child;
+		while (child !== null) {
+			commitPassiveUnmountOnFiber(child);
+			child = child.sibling;
+		}
+	}
+}
+
+/**
+ * Commit the passive unmount effects by traversing the fiber tree.
+ */
+function commitPassiveUnmountOnFiber(finishedWork: Fiber): void {
+	switch (finishedWork.tag) {
+		case FunctionComponent: {
+			recursivelyTraversePassiveUnmountEffects(finishedWork);
+
+			if (finishedWork.flags & Passive) {
+				commitHookPassiveUnmountEffects(
+					finishedWork,
+					PassiveEffect | HasEffect,
+				);
+			}
+
+			return;
+		}
+		default: {
+			recursivelyTraversePassiveUnmountEffects(finishedWork);
+			return;
+		}
+	}
+}
+
+export function commitPassiveUnmountEffects(finishedWork: Fiber) {
+	commitPassiveUnmountOnFiber(finishedWork);
+}
+
+/**
+ * Commit the passive mount effects by traversing the circular
+ * linked list of effects. Fires the effects and stores the
+ * destroy functions for unmounting.
+ */
+function commitHookEffectListMount(finishedWork: Fiber, hookFlags: HookFlags) {
+	const updateQueue = finishedWork.updateQueue;
+	const lastEffect = updateQueue !== null ? updateQueue.lastEffect : null;
+	if (lastEffect !== null) {
+		const firstEffect = lastEffect.next;
+		let effect = firstEffect!;
+		do {
+			if ((effect.tag & hookFlags) === hookFlags) {
+				const create = effect.create;
+				effect.destroy = create();
+			}
+			effect = effect.next!;
+		} while (effect !== firstEffect);
+	}
+}
+
+function commitHookPassiveMountEffects(
+	finishedWork: Fiber,
+	hookFlags: HookFlags,
+) {
+	commitHookEffectListMount(finishedWork, hookFlags);
+}
+
+function recursivelyTraversePassiveMountEffects(
+	root: FiberRoot,
+	parentFiber: Fiber,
+	committedLanes: Lanes,
+) {
+	if (parentFiber.subtreeFlags & PassiveMask) {
+		let child = parentFiber.child;
+		while (child !== null) {
+			commitPassiveMountOnFiber(root, child, committedLanes);
+			child = child.sibling;
+		}
+	}
+}
+
+/**
+ * Commit the passive mount effects by traversing the fiber tree.
+ */
+function commitPassiveMountOnFiber(
+	finishedRoot: FiberRoot,
+	finishedWork: Fiber,
+	committedLanes: Lanes,
+) {
+	switch (finishedWork.tag) {
+		case FunctionComponent: {
+			recursivelyTraversePassiveMountEffects(
+				finishedRoot,
+				finishedWork,
+				committedLanes,
+			);
+
+			if ((finishedWork.flags & Passive) !== NoFlags) {
+				commitHookPassiveMountEffects(finishedWork, PassiveEffect | HasEffect);
+			}
+
+			return;
+		}
+
+		default: {
+			recursivelyTraversePassiveMountEffects(
+				finishedRoot,
+				finishedWork,
+				committedLanes,
+			);
+			return;
+		}
+	}
+}
+
+export function commitPassiveMountEffects(
+	root: FiberRoot,
+	finishedWork: Fiber,
+	committedLanes: Lanes,
+) {
+	commitPassiveMountOnFiber(root, finishedWork, committedLanes);
 }

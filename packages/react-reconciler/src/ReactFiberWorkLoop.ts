@@ -1,12 +1,21 @@
 import { scheduleMicrotask, supportsMicrotasks } from "ReactFiberConfig";
+import type { FrameCallbackType } from "scheduler";
+import {
+	unstable_NormalPriority as NormalSchedulerPriority,
+	unstable_scheduleCallback,
+} from "scheduler";
 import { logger } from "shared/logger";
 
 import type { Fiber } from "./ReactFiber";
 import { createWorkInProgress } from "./ReactFiber";
 import { beginWork } from "./ReactFiberBeginWork";
-import { commitMutationEffects } from "./ReactFiberCommitWork";
+import {
+	commitMutationEffects,
+	commitPassiveMountEffects,
+	commitPassiveUnmountEffects,
+} from "./ReactFiberCommitWork";
 import { completeWork } from "./ReactFiberCompleteWork";
-import { MutationMask, NoFlags } from "./ReactFiberFlags";
+import { MutationMask, NoFlags, PassiveMask } from "./ReactFiberFlags";
 import {
 	getHighestPriorityLane,
 	getNextLanes,
@@ -24,6 +33,9 @@ import { HostRoot } from "./ReactWorkTag";
 
 let workInProgress: Fiber | null = null;
 let workInProgressRootRenderLanes: Lanes = NoLanes;
+let rootDoesHavePassiveEffects: boolean = false;
+let rootWithPendingPassiveEffects: FiberRoot | null = null;
+let pendingPassiveEffectsLanes: Lanes = NoLanes;
 
 /**
  * Prepares a fresh stack for the given root node, which is the entry point of the fiber tree.
@@ -169,19 +181,48 @@ function commitRoot(root: FiberRoot) {
 	// Lanes have been scheduled. Remove them from the root.
 	markRootFinished(root, lanes);
 
+	// Process the passive effects.
+	if (
+		(finishedWork.flags & PassiveMask) !== NoFlags ||
+		(finishedWork.subtreeFlags & PassiveMask) !== NoFlags
+	) {
+		if (!rootDoesHavePassiveEffects) {
+			rootDoesHavePassiveEffects = true;
+			scheduleCallback(NormalSchedulerPriority, () => {
+				flushPassiveEffects();
+				return;
+			});
+		}
+	}
+
 	const subtreeHasEffects =
 		(finishedWork.subtreeFlags & MutationMask) !== NoFlags;
 	const rootHasEffects = (finishedWork.flags & MutationMask) !== NoFlags;
 
 	if (subtreeHasEffects || rootHasEffects) {
-		// Before mutation
 		// Mutation
 		commitMutationEffects(root, finishedWork);
+
+		// The work-in-progress tree is now the current tree. This must come after
+		// the mutation phase, so that the previous tree is still current during
+		// componentWillUnmount, but before the layout phase, so that the finished
+		// work is current during componentDidMount/Update.
 		root.current = finishedWork;
 		// Layout
 	} else {
+		// No effects, switch the current tree to the work-in-progress tree.
 		root.current = finishedWork;
 	}
+
+	if (rootDoesHavePassiveEffects) {
+		rootDoesHavePassiveEffects = false;
+		rootWithPendingPassiveEffects = root;
+		pendingPassiveEffectsLanes = lanes;
+	}
+
+	// Always call this before exiting `commitRoot`, to ensure that any
+	// additional work on this root is scheduled.
+	ensureRootIsScheduled(root);
 }
 
 function workLoop() {
@@ -217,4 +258,20 @@ function completeUnitOfWork(unitOfWork: Fiber) {
 		completedWork = completedWork.return;
 		workInProgress = completedWork;
 	} while (completedWork !== null);
+}
+
+function flushPassiveEffects() {
+	if (rootWithPendingPassiveEffects !== null) {
+		const root = rootWithPendingPassiveEffects;
+		const lanes = pendingPassiveEffectsLanes;
+		rootWithPendingPassiveEffects = null;
+		pendingPassiveEffectsLanes = NoLanes;
+
+		commitPassiveUnmountEffects(root.current);
+		commitPassiveMountEffects(root, root.current, lanes);
+	}
+}
+
+function scheduleCallback(priorityLevel: number, callback: FrameCallbackType) {
+	return unstable_scheduleCallback(priorityLevel, callback);
 }

@@ -20,6 +20,7 @@
 		"dev": "vite build --watch --mode development"
 	},
 	"peerDependencies": {
-		"react": "workspace:*"
+		"react": "workspace:*",
+		"scheduler": "^0.23.2"
 	}
 }

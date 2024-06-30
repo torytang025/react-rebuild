@@ -26,7 +26,7 @@ export default defineConfig((config) => {
 				},
 			},
 			rollupOptions: {
-				external: ["react"],
+				external: ["react", "scheduler"],
 			},
 		},
 		plugins: [

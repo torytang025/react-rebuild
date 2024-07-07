@@ -14,6 +14,13 @@
 - **Reconciliation**: Accurate implementation of React's reconciliation algorithm for efficient UI updates.
 - **Hooks**: Implement core official React Hooks (`useState`, `useEffect`, etc.).
 
+## Relevant Posts
+Meanwhile, I will also be writing a series of posts. This series of posts aims to document my insights and assist other developers in exploring React's inner workings. The series includes:
+
+- [Understanding React - Part 0. Introduction](https://www.tory.cool/blog/understanding-react-part-0-introduction)
+- [Understanding React - Part 1. React Element, JSX and Fiber](https://www.tory.cool/blog/understanding-react-part-1-react-element-jsx-and-fiber)
+- 🚧...
+
 ## Installation
 
 We use [pnpm](https://pnpm.io/) as our package manager. To install React-Rebuild, follow these steps:

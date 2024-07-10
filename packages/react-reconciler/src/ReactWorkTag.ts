@@ -17,7 +17,7 @@ export const FunctionComponent = 0;
 export const HostRoot = 3;
 
 /**
- * Represents a native DOM element.
+ * Represents an element in the host environment, like a native DOM element.
  * @example <h1>hello</h1>
  */
 export const HostComponent = 5;

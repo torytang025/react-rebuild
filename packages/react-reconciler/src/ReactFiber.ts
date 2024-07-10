@@ -77,7 +77,7 @@ export class Fiber<State = unknown> {
 	// === Identity ===
 
 	/**
-	 * the type of work or component the fiber represents
+	 * the tag of the fiber
 	 * @example see WorkTag
 	 */
 	tag: WorkTag;
@@ -117,7 +117,7 @@ export class Fiber<State = unknown> {
       Function components do not have instances in the same way class components do, so stateNode is typically null for function component fibers.
       Example: If a fiber represents a function component MyFunctionComponent, stateNode will be null.
     HostRoot:
-      For the root fiber (HostRoot) of a React application, the stateNode points to the FiberRootNode, which contains the reference to the root container where the React tree is mounted. See FiberRootNode for more information.
+      For the root fiber (HostRoot) of a React application, the stateNode points to the Fiber Root, which contains the reference to the root container where the React tree is mounted. See FiberRootNode for more information.
       Example: For a React app rendered with ReactDOM.createRoot(document.getElementById('root')).render(<App />), the stateNode of the HostRoot fiber points to the FiberRootNode, which in turn holds a reference to the container DOM node with the id root.
     ```
 	 */
@@ -149,7 +149,7 @@ export class Fiber<State = unknown> {
 	 */
 	pendingProps: Props;
 	/**
-	 * represents the props that were last applied to the component after the reconciliation process completed.
+	 * represents the props that were last applied to the component after the reconciliation process is completed.
 	 */
 	memorizedProps: Props | null;
 	/**
@@ -168,12 +168,12 @@ export class Fiber<State = unknown> {
 	memorizedState: State | null;
 	/**
 	 * the queue of updates that need to be applied to this fiber
-	 * For function components, the update queue is a linked list of hooks that store the component's state.
+	 * For function components, the update queue is a linked list of effects that need to be applied to the component.
 	 */
 	updateQueue: UpdateQueue<State> | null;
 
 	/**
-	 * links a fiber to its previous version (work-in-progress -> current), enabling efficient reconciliation between renders.
+	 * links a fiber to its previous/next version (work-in-progress -> current -> work-in-progress), enabling efficient reconciliation between renders.
 	 * only exists during the process of generating a new fiber node tree.
 	 */
 	alternate: Fiber | null;
